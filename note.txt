@@ -1,0 +1,17 @@
+For removing a transaction manually from the view and it staying removed:
+
+Concatonate a transaction's started date, completed date, and balace to form a unique ID.
+If you have removed a t. with this unqique ID, it shouldn't show up in the DF.
+The problem with this: in loadtransactions() -> we have completly removed some of these values from
+tables.
+Potential fix: rename the loadtransactions() function to loadTransactionsForViewing and call it only
+when we want to display the information. But we need implement a loadtransactions() function for parsing
+the csv for the first time.
+The remove button itseelf could be implemented as a 'Remove' category.
+
+Adding a details column to all the transactions
+
+Remove intrest earned from Debit view
+This could be easily solved by: Type = 'TOPUP' OR Description = 'Transfer from Revolut user'
+The Debit view's first thing shouldnt be the df. It should be a chart.
+The df is only for optionally manipulating the debits data, or for checking its integrity.
