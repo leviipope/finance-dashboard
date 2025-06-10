@@ -14,6 +14,8 @@ def load_statement(file):
         df['Started Date'] = pd.to_datetime(df['Started Date'])
         df = df.rename(columns={"Started Date": "Date"})
         df["Hide"] = False
+        df['Amount'] = df['Amount'].round().astype(int)
+        df['Balance'] = df['Balance'].round().astype(int)
 
         return df
     except Exception as e:
