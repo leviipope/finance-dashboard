@@ -47,7 +47,7 @@ def main():
         main_df = load_main_dataframe()
         if main_df is not None:
 
-            col1, _, col2, _ = st.columns([8, 1, 4, 8])
+            col1, _, col2, col3, _ = st.columns([5, 1, 2, 2, 3])
 
             with col1:
                 min_date = main_df['Date'].min().date()
@@ -62,18 +62,30 @@ def main():
             with col2:
                 type_options = ['ALL'] + list(main_df['Type'].unique())
                 selected_type = st.selectbox("Filter by Type", options=type_options)
+                
+            with col3:
+                transaction_type_options = ['ALL'] + list(["Credits", "Debits"])
+                selected_transaction_type = st.selectbox("Filter by transaction type", options=transaction_type_options)
+                
 
             if selected_type == 'ALL':
-                filtered_df = main_df[
-                    (main_df['Date'].dt.date >= selected_date_range[0]) &
-                    (main_df['Date'].dt.date <= selected_date_range[1])
-                ]
+                type_filter = main_df['Type'].notnull()  # Include all types
             else:
-                filtered_df = main_df[
-                    (main_df['Date'].dt.date >= selected_date_range[0]) &
-                    (main_df['Date'].dt.date <= selected_date_range[1]) &
-                    (main_df['Type'] == selected_type)
-                ]
+                type_filter = main_df['Type'] == selected_type
+
+            if selected_transaction_type == 'ALL':
+                transaction_type_filter = main_df['Amount'].notnull()  # Include all transactions
+            elif selected_transaction_type == 'Credits':
+                transaction_type_filter = main_df['Amount'] < 0
+            elif selected_transaction_type == 'Debits':
+                transaction_type_filter = main_df['Amount'] > 0
+
+            filtered_df = main_df[
+                (main_df['Date'].dt.date >= selected_date_range[0]) &
+                (main_df['Date'].dt.date <= selected_date_range[1]) &
+                type_filter &
+                transaction_type_filter
+            ]
 
             column_config = {col: st.column_config.Column(col, disabled=True) for col in filtered_df.columns if col != 'Hide'}
             column_config['Hide'] = st.column_config.CheckboxColumn('Hide')
