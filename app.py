@@ -9,13 +9,27 @@ MAIN_DATAFRAME_FILE = "main_dataframe.csv"
 def load_statement(file):
     try: 
         df = pd.read_csv(file)
-        df = df.drop(["Fee","Completed Date","Currency","State"], axis=1)
+        df = df.drop(["Fee", "Completed Date", "Currency", "State"], axis=1)
         df = df[df["Type"] != "INTEREST"]
         df['Started Date'] = pd.to_datetime(df['Started Date'])
         df = df.rename(columns={"Started Date": "Date"})
         df["Hide"] = False
         df['Amount'] = df['Amount'].round().astype(int)
-        df['Balance'] = df['Balance'].round().astype(int)
+
+        try:
+            df['Balance'] = pd.to_numeric(df['Balance'], errors='coerce').round().astype('Int64')
+            dropped_rows = df[df['Balance'].isnull()]
+            
+            if not dropped_rows.empty:
+                st.warning(f"Dropped {len(dropped_rows)} rows due to invalid or null Balance:")
+                for index, row in dropped_rows.iterrows():
+                    st.warning(f"{row['Description']} {row['Amount']}")
+
+            
+            df = df.dropna(subset=['Balance'])
+        except Exception as e:
+            st.error(f"Error processing Balance column: {str(e)}")
+            st.stop()
 
         return df
     except Exception as e:
@@ -105,6 +119,5 @@ def main():
                 new_df = load_statement(upload_file)
                 updated_df = merge_dataframes(main_df, new_df)
                 save_main_dataframe(updated_df)
-
 
 main()
