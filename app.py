@@ -2,6 +2,8 @@ import pandas as pd
 import streamlit as st
 import os
 import json
+import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(page_title="Simple finance app", page_icon=":money_with_wings:", layout="wide") 
 
@@ -188,5 +190,79 @@ def main():
                 new_df = load_statement(upload_file)
                 updated_df = merge_dataframes(main_df, new_df)
                 save_main_dataframe(updated_df)
+
+    if page == "Spending Analytics":
+        st.title("Spending Analytics")
+        
+        main_df = load_main_dataframe()
+        if main_df is not None:
+            spending_df = main_df[main_df['Amount'] < 0].copy()
+
+            col1, _, = st.columns([1, 2])
+            with col1:
+                min_date = spending_df['Date'].min().date()
+                max_date = spending_df['Date'].max().date()
+                selected_date_range = st.slider(
+                    "Filter by Date",
+                    min_date,
+                    max_date,
+                    (
+                        (max_date.replace(day=7) - pd.DateOffset(months=1)).date(),
+                        max_date
+                    )
+                )
+
+            filtered_spending_df = spending_df[
+                (spending_df['Date'].dt.date >= selected_date_range[0]) &
+                (spending_df['Date'].dt.date <= selected_date_range[1])
+            ]
+
+            if st.checkbox("Show all spending data"):
+                st.dataframe(filtered_spending_df)
+
+            # Balance over time line chart
+            st.subheader("Balance Over Time")
+            
+            balance_chart_data = main_df[
+                (main_df['Product'] == 'Current') &
+                (main_df['Date'].dt.date >= selected_date_range[0]) &
+                (main_df['Date'].dt.date <= selected_date_range[1])
+            ].copy()
+
+            balance_chart_data = balance_chart_data.sort_values(by='Date')
+
+            if not balance_chart_data.empty:
+                fig_balance_over_time = px.line(
+                    balance_chart_data,
+                    x='Date',
+                    y='Balance',
+                    title='Current Account Balance Over Time',
+                    markers=True 
+                )
+                st.plotly_chart(fig_balance_over_time, use_container_width=True)
+            else:
+                st.write("No 'Current' account balance data to display for the selected period.")
+            
+
+            # Daily spending line chart
+            daily_spending = filtered_spending_df.groupby('Date')['Amount'].sum().reset_index()
+            daily_spending['Amount'] = daily_spending['Amount'].abs()
+            fig_daily_spending = px.line(
+                daily_spending,
+                x='Date',
+                y='Amount',
+                title='Daily Spending Over Time',
+                markers=True,
+            )
+            fig_daily_spending.update_traces(marker=dict(size=7, color='white')) # Adjust marker size and use a softer red
+            fig_daily_spending.update_layout(
+                yaxis_type="log",
+                xaxis=dict(
+                    dtick="D1"
+                )
+            )
+            st.plotly_chart(fig_daily_spending, use_container_width=True)
+
+            
 
 main()

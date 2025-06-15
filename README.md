@@ -13,14 +13,14 @@
     - bug: when adding a complete new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
-- checkbox: display the credit dataframe
-- linechart, daily spending
+- checkbox: display the credit dataframe ✅
+- linechart, daily spending 🚧
     - maybe make this a selectable option to view it weekly or daily
     - Line chart showing how credits add up throughout the month
     - Highlight unusual spikes in daily spending
 - list of biggest transactions in a month (top 10/15)
 - daily spend heatmap?
-- balance over time!
+- balance over time 🚧
 
 ### Debits page
 - savings account balance over time
