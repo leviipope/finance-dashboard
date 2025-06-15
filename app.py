@@ -182,7 +182,7 @@ def main():
         else:
             st.error("No data available to edit")
 
-        col1, _ = st.columns([1,2])
+        col1, _ = st.columns([1, 2])
 
         with col1:
             upload_file = st.file_uploader("Upload your new Revolut statement", type=["csv"])
@@ -198,7 +198,7 @@ def main():
         if main_df is not None:
             spending_df = main_df[main_df['Amount'] < 0].copy()
 
-            col1, _, = st.columns([1, 2])
+            col1, _, col2 = st.columns([4, 1, 9])
             with col1:
                 min_date = spending_df['Date'].min().date()
                 max_date = spending_df['Date'].max().date()
@@ -217,12 +217,17 @@ def main():
                 (spending_df['Date'].dt.date <= selected_date_range[1])
             ]
 
+            with col2:    
+                total_spending = filtered_spending_df['Amount'].sum()
+                st.metric(
+                    label="Total Spending in the selected period",
+                    value=f"{abs(total_spending):,.0f} Ft"
+                )
+
             if st.checkbox("Show all spending data"):
                 st.dataframe(filtered_spending_df)
 
             # Balance over time line chart
-            st.subheader("Balance Over Time")
-            
             balance_chart_data = main_df[
                 (main_df['Product'] == 'Current') &
                 (main_df['Date'].dt.date >= selected_date_range[0]) &
@@ -232,37 +237,66 @@ def main():
             balance_chart_data = balance_chart_data.sort_values(by='Date')
 
             if not balance_chart_data.empty:
-                fig_balance_over_time = px.line(
+                fig_balance_over_time = px.area(
                     balance_chart_data,
                     x='Date',
                     y='Balance',
-                    title='Current Account Balance Over Time',
-                    markers=True 
+                    title='Account Balance Over Time',
+                    markers=True
                 )
                 st.plotly_chart(fig_balance_over_time, use_container_width=True)
             else:
                 st.write("No 'Current' account balance data to display for the selected period.")
             
-
-            # Daily spending line chart
-            daily_spending = filtered_spending_df.groupby('Date')['Amount'].sum().reset_index()
-            daily_spending['Amount'] = daily_spending['Amount'].abs()
-            fig_daily_spending = px.line(
-                daily_spending,
-                x='Date',
-                y='Amount',
-                title='Daily Spending Over Time',
-                markers=True,
-            )
-            fig_daily_spending.update_traces(marker=dict(size=7, color='white')) # Adjust marker size and use a softer red
-            fig_daily_spending.update_layout(
-                yaxis_type="log",
-                xaxis=dict(
-                    dtick="D1"
+            col1, _ = st.columns([1, 5])
+            with col1:
+                spending_ot_selector = st.selectbox(
+                    "Spending Over Time",
+                    options=("Individual Transactions", "Daily", "Weekly")
                 )
-            )
-            st.plotly_chart(fig_daily_spending, use_container_width=True)
+
+            if spending_ot_selector == "Individual Transactions":
+                daily_spending_detailed = filtered_spending_df.copy()
+                daily_spending_detailed['Amount'] = daily_spending_detailed['Amount'].abs()
+                daily_spending_detailed = daily_spending_detailed.sort_values(by='Date')
+
+                fig_daily_spending = px.scatter(
+                    daily_spending_detailed,
+                    x='Date',
+                    y='Amount',
+                    title='Individual Spending Over Time',
+                    hover_data={'Description': True}
+                )
+                fig_daily_spending.update_traces(marker=dict(size=7, color='white'))
+                fig_daily_spending.update_layout(yaxis_type="log",xaxis=dict(nticks=20))
+                st.plotly_chart(fig_daily_spending, use_container_width=True)
+
+            if spending_ot_selector == "Daily":
+                daily_spending = filtered_spending_df.groupby(filtered_spending_df['Date'].dt.date)['Amount'].sum().reset_index()
+                daily_spending['Amount'] = daily_spending['Amount'].abs()
+                daily_spending = daily_spending.sort_values(by='Date')
+                daily_spending['Amount Label'] = daily_spending['Amount'].apply(lambda x: f'{x/1000:.0f}k' if x >= 1000 else f'{x:.0f}')
+                fig_daily_spending = px.scatter(
+                    daily_spending,
+                    x='Date',
+                    y='Amount',
+                    title='Spending Over Time',
+                    text='Amount Label'
+                )
+                fig_daily_spending.update_traces(
+                    marker=dict(size=7,color='white'),
+                    textposition='bottom center',
+                    textfont=dict(size=14, color='white')
+                )
+                fig_daily_spending.update_layout(
+                    yaxis_type="log",
+                    xaxis=dict(
+                        tickvals=daily_spending['Date'],
+                        ticktext=[date.strftime('%m %d') for date in daily_spending['Date']],
+                        tickangle=45
+                    )
+                )
+                st.plotly_chart(fig_daily_spending, use_container_width=True)
 
             
-
 main()

@@ -14,13 +14,13 @@
 
 ### Credits page
 - checkbox: display the credit dataframe ✅
-- linechart, daily spending 🚧
-    - maybe make this a selectable option to view it weekly or daily
-    - Line chart showing how credits add up throughout the month
-    - Highlight unusual spikes in daily spending
+- spending over time 🚧
+    - options: individual, daily, weekly    ✅ 2/3
+    - when individual is select, make two graphs, the right one adds up transactions over time
+    - highlight unusual spikes
 - list of biggest transactions in a month (top 10/15)
 - daily spend heatmap?
-- balance over time 🚧
+- balance over time 🚧 (its still missing something)
 
 ### Debits page
 - savings account balance over time
