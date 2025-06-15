@@ -9,6 +9,8 @@
 - fix the null balance bug ✅
 - implement categories 😭 ✅
     - single transaction categoryizing feature
+    - bug: after pressing apply, you need to manually reload the page for the categorization
+    - bug: when adding a complete new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
 - checkbox: display the credit dataframe
