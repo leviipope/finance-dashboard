@@ -94,6 +94,22 @@ def add_keyword_to_category(category, keyword):
         return True
     return False
 
+def get_spending_color(amount):
+    amount = abs(amount)
+    max_amount = 2_000_000
+    normalized = min(amount / max_amount, 1.0)
+    
+    # Interpolate between salmon (low) and dark red (high)
+    # Salmon: #FA8072, Dark Red: #8B0000
+    salmon_r, salmon_g, salmon_b = 250, 128, 114
+    dark_red_r, dark_red_g, dark_red_b = 139, 0, 0
+    
+    r = int(salmon_r + (dark_red_r - salmon_r) * normalized)
+    g = int(salmon_g + (dark_red_g - salmon_g) * normalized)
+    b = int(salmon_b + (dark_red_b - salmon_b) * normalized)
+    
+    return f"rgb({r}, {g}, {b})"
+
 def main():
     page = st.sidebar.radio("Go to", ["Customize Data", "Spending Analytics", "Income Analytics"])
 
@@ -219,9 +235,26 @@ def main():
 
             with col2:    
                 total_spending = filtered_spending_df['Amount'].sum()
-                st.metric(
-                    label="Total Spending in the selected period",
-                    value=f"{abs(total_spending):,.0f} Ft"
+                spending_color = get_spending_color(total_spending)
+                
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color: transparent;
+                        padding: 15px;
+                        border-radius: 10px;
+                        text-align: center;
+                        font-weight: bold;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        display: inline-block;
+                        width: auto;
+                    ">
+                        <div style="font-size: 32px; color: white;">
+                            Total spent in the selected period: <span style="color: {spending_color};">{abs(total_spending):,.0f} Ft</span>
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
                 )
 
             if st.checkbox("Show all spending data"):

@@ -13,9 +13,13 @@
     - bug: when adding a complete new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
+- date filter ✅
+- total spending with color gradient 🚧
+    - check for a color graident picker API or smth
+    - check for a better solution then st.markdown
 - checkbox: display the credit dataframe ✅
 - spending over time 🚧
-    - options: individual, daily, weekly    ✅ 2/3
+    - options: individual, daily, weekly 🚧
     - when individual is select, make two graphs, the right one adds up transactions over time
     - highlight unusual spikes
 - list of biggest transactions in a month (top 10/15)
