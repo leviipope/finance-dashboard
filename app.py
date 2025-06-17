@@ -197,6 +197,7 @@ def main():
                     if new_hide_status != main_df.at[idx, "Hide"]:
                         main_df.at[idx, "Hide"] = new_hide_status
 
+                main_df = categorize_transactions(main_df)
                 save_main_dataframe(main_df)
                 st.rerun()
 

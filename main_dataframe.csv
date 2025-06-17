@@ -7,7 +7,7 @@ CARD_PAYMENT,Current,2025-05-01 12:29:37,Viger Katalin E.v.,-700,24132,False,Foo
 TOPUP,Current,2025-05-01 21:55:08,Top-Up by *7109,6000,30132,False,Uncategorized
 TRANSFER,Current,2025-05-02 18:20:15,Transfer from Revolut user,5200,35332,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-01 21:59:59,Steam,-6028,29304,False,Entertainment
-CARD_PAYMENT,Current,2025-05-02 12:47:33,Sostozoo,-15600,13704,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-02 12:47:33,Sostozoo,-15600,13704,False,Entertainment
 CARD_PAYMENT,Current,2025-04-29 17:59:24,HELL Energy,-430,13274,False,Food
 TRANSFER,Current,2025-05-03 10:27:34,Transfer from Revolut user,1267,14540,False,Uncategorized
 TRANSFER,Current,2025-05-03 10:30:05,Transfer to Revolut user,-1266,13274,False,Uncategorized
@@ -22,7 +22,7 @@ TRANSFER,Current,2025-05-05 11:43:25,Zéti Polgári,-200000,22057,False,Uncatego
 TOPUP,Current,2025-05-05 11:48:54,Top-Up by *7109,4500,26557,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-04 10:55:24,Vitaminkucko,-3719,22838,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-05 15:09:48,Nemzeti Dohánybolt,-688,22150,False,Nemzeti Dohánybolt
-CARD_PAYMENT,Current,2025-05-05 16:50:01,Both-Dega Büfe,-1500,20650,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-05 16:50:01,Both-Dega Büfe,-1500,20650,False,Food
 CARD_PAYMENT,Current,2025-05-05 15:38:05,Simple,-989,19661,False,Uncategorized
 TRANSFER,Current,2025-05-07 15:12:35,Transfer to Revolut user,-12000,7661,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-07 07:48:07,Civis Cafe Canteen,-1400,6261,False,Food
@@ -35,7 +35,7 @@ TRANSFER,Current,2025-05-09 10:02:12,To HUF Rainy day,-60000,96177,False,Uncateg
 TRANSFER,Current,2025-05-10 20:03:56,Transfer from Revolut user,7500,103677,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-10 20:03:59,Wolt,-7835,95842,False,Food
 CARD_PAYMENT,Current,2025-05-10 16:55:58,Simple,-325,95517,False,Uncategorized
-CARD_PAYMENT,Current,2025-05-11 11:13:39,Nagy Beki Pekseg,-850,94667,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-11 11:13:39,Nagy Beki Pekseg,-850,94667,False,Food
 CARD_PAYMENT,Current,2025-05-12 17:45:39,Annuska fagylaltbisztró és kávézó,-3330,91337,False,Food
 CARD_PAYMENT,Current,2025-05-12 19:53:01,Reál,-1957,89380,False,Food
 CARD_PAYMENT,Current,2025-05-12 17:01:51,dm drogerie,-2499,86881,False,Uncategorized
@@ -237,7 +237,7 @@ CARD_PAYMENT,Current,2025-02-16 00:43:05,MAXILine Töltőállomás,-10068,45299,
 TOPUP,Current,2025-02-17 17:14:15,Top-Up by *7109,4000,49299,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-17 16:37:55,Lidl,-5069,44230,False,Food
 CARD_PAYMENT,Current,2025-02-18 21:57:13,Spotify,-1090,43140,False,Uncategorized
-CARD_PAYMENT,Current,2025-02-18 15:45:40,HELLA AUTOTECHNIK NOVA s.r.o.,-430,42710,False,Uncategorized
+CARD_PAYMENT,Current,2025-02-18 15:45:40,HELLA AUTOTECHNIK NOVA s.r.o.,-430,42710,False,Food
 CARD_PAYMENT,Current,2025-02-18 09:35:21,Debreceni Egyetem,-470,42240,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-18 11:37:31,"Diagnostic Sport, Lifestyle and Therapy Center",-13000,29240,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-20 07:49:24,Cocacolahbcmagyaror,-500,28740,False,Food
@@ -251,7 +251,7 @@ TRANSFER,Current,2025-02-23 15:16:11,To HUF Temp,-30000,39489,False,Uncategorize
 TRANSFER,Current,2025-02-24 09:28:48,Transfer from Revolut user,2063,41552,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-23 15:14:00,MAXILine Töltőállomás,-20819,20733,False,Gas
 CARD_PAYMENT,Current,2025-02-24 08:57:19,Apple,-6190,14543,False,Subscriptions
-CARD_PAYMENT,Current,2025-02-24 17:25:48,HELLA AUTOTECHNIK NOVA s.r.o.,-430,14113,False,Uncategorized
+CARD_PAYMENT,Current,2025-02-24 17:25:48,HELLA AUTOTECHNIK NOVA s.r.o.,-430,14113,False,Food
 CARD_PAYMENT,Current,2025-02-24 15:47:56,Simple,-896,13217,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-25 12:27:37,Twitch,-2018,11199,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-25 12:46:56,Coop,-1997,9202,False,Food
@@ -306,7 +306,7 @@ TRANSFER,Current,2025-03-09 11:46:56,To HUF,50000,100350,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-08 10:11:37,Simple,-244,100106,False,Uncategorized
 TRANSFER,Current,2025-03-09 15:53:25,Transfer from Revolut user,2000,102106,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-09 10:42:35,Viger Katalin E.v.,-1430,100676,False,Food
-CARD_PAYMENT,Current,2025-03-09 15:10:31,Nagy Beki Pekseg,-400,100276,False,Uncategorized
+CARD_PAYMENT,Current,2025-03-09 15:10:31,Nagy Beki Pekseg,-400,100276,False,Food
 TOPUP,Current,2025-03-10 12:04:49,Top-Up by *7109,185000,285276,False,Uncategorized
 TRANSFER,Current,2025-03-10 12:06:21,To HUF Temp,-230000,55276,False,Uncategorized
 TRANSFER,Current,2025-03-10 15:48:11,To HUF,330000,385276,False,Uncategorized
@@ -355,7 +355,7 @@ EXCHANGE,Current,2025-03-22 23:47:48,Exchange to HUF,102451,138927,False,Uncateg
 TRANSFER,Current,2025-03-22 23:49:32,Transfer to Revolut user,-49000,89927,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-21 22:18:00,McDonald's,-5690,84237,False,Food
 CARD_PAYMENT,Current,2025-03-22 16:54:31,Nemzeti Dohánybolt,-11728,72509,False,Nemzeti Dohánybolt
-CARD_PAYMENT,Current,2025-03-22 13:52:22,Nagy Beki Pekseg,-1330,71179,False,Uncategorized
+CARD_PAYMENT,Current,2025-03-22 13:52:22,Nagy Beki Pekseg,-1330,71179,False,Food
 CARD_PAYMENT,Current,2025-03-22 10:38:33,"Diagnostic Sport, Lifestyle and Therapy Center",-13000,58179,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-23 17:52:51,Tippmixpro,-4000,54179,False,Entertainment
 TRANSFER,Current,2025-03-24 12:28:42,Transfer from Revolut user,4000,58179,False,Uncategorized
@@ -364,8 +364,8 @@ CARD_PAYMENT,Current,2025-03-24 07:57:34,Apple,-6190,49409,False,Subscriptions
 TRANSFER,Current,2025-03-25 13:39:08,Transfer to Revolut user,-2300,47109,False,Uncategorized
 TRANSFER,Current,2025-03-25 16:52:01,Transfer to Revolut user,-1000,46109,False,Uncategorized
 TRANSFER,Current,2025-03-25 16:52:34,Transfer from Revolut user,1000,47109,False,Uncategorized
-CARD_PAYMENT,Current,2025-03-25 17:55:34,Both-Dega Büfe,-1220,45889,False,Uncategorized
-CARD_PAYMENT,Current,2025-03-25 07:49:40,HELLA AUTOTECHNIK NOVA s.r.o.,-430,45459,False,Uncategorized
+CARD_PAYMENT,Current,2025-03-25 17:55:34,Both-Dega Büfe,-1220,45889,False,Food
+CARD_PAYMENT,Current,2025-03-25 07:49:40,HELLA AUTOTECHNIK NOVA s.r.o.,-430,45459,False,Food
 CARD_PAYMENT,Current,2025-03-25 12:27:39,Twitch,-2001,43458,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-26 07:56:43,Civis Cafe Canteen,-2631,40827,False,Food
 TOPUP,Current,2025-03-27 11:50:47,Top-Up by *7109,6560,47387,False,Uncategorized
@@ -501,7 +501,7 @@ EXCHANGE,Current,2025-06-12 08:51:05,Exchange to EUR,-150610,104712,False,Uncate
 TRANSFER,Current,2025-06-12 17:16:02,Mark Fodor,-1000,103705,False,Uncategorized
 TRANSFER,Current,2025-06-12 20:46:11,Transfer to Revolut user,-10000,93705,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 09:19:11,Civis Cafe Canteen,-427,93278,False,Food
-CARD_PAYMENT,Current,2025-06-12 16:18:22,Nagy Beki Pekseg,-2190,91088,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 16:18:22,Nagy Beki Pekseg,-2190,91088,False,Food
 TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,True,Uncategorized
 TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,True,Uncategorized
 TRANSFER,Current,2025-06-13 18:37:24,Transfer from Revolut user,5771,101522,True,Uncategorized
