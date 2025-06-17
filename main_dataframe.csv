@@ -123,7 +123,7 @@ CARD_REFUND,Current,2025-01-04 01:00:00,Delfinbúvár,2870,66090,False,Uncategor
 TRANSFER,Current,2025-01-05 14:34:44,Transfer from Revolut user,50000,116090,False,Uncategorized
 TRANSFER,Current,2025-01-05 15:16:16,To HUF Dentist,-50000,66090,False,Uncategorized
 TOPUP,Current,2025-01-08 12:08:57,Top-Up by *7109,20000,86090,False,Uncategorized
-CARD_PAYMENT,Current,2025-01-07 16:42:26,MAXILine Töltőállomás,-10002,76088,False,Uncategorized
+CARD_PAYMENT,Current,2025-01-07 16:42:26,MAXILine Töltőállomás,-10002,76088,False,Gas
 CARD_PAYMENT,Current,2025-01-08 17:04:47,Simple,-613,75475,False,Uncategorized
 CARD_PAYMENT,Current,2025-01-08 17:53:02,Magyar Posta,-7170,68305,False,Uncategorized
 TOPUP,Current,2025-01-10 11:48:42,Top-Up by *7109,241357,309662,False,Uncategorized
@@ -249,7 +249,7 @@ TRANSFER,Current,2025-02-22 15:36:57,To Lilla Salanki,-4500,19489,False,Uncatego
 TRANSFER,Current,2025-02-23 15:11:56,To HUF,50000,69489,False,Uncategorized
 TRANSFER,Current,2025-02-23 15:16:11,To HUF Temp,-30000,39489,False,Uncategorized
 TRANSFER,Current,2025-02-24 09:28:48,Transfer from Revolut user,2063,41552,False,Uncategorized
-CARD_PAYMENT,Current,2025-02-23 15:14:00,MAXILine Töltőállomás,-20819,20733,False,Uncategorized
+CARD_PAYMENT,Current,2025-02-23 15:14:00,MAXILine Töltőállomás,-20819,20733,False,Gas
 CARD_PAYMENT,Current,2025-02-24 08:57:19,Apple,-6190,14543,False,Subscriptions
 CARD_PAYMENT,Current,2025-02-24 17:25:48,HELLA AUTOTECHNIK NOVA s.r.o.,-430,14113,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-24 15:47:56,Simple,-896,13217,False,Uncategorized
@@ -332,7 +332,7 @@ CARD_PAYMENT,Current,2025-03-14 21:49:17,Nemzeti Dohánybolt,-3000,50271,False,N
 TRANSFER,Current,2025-03-15 14:50:00,From Savings Account,30000,80271,False,Uncategorized
 TRANSFER,Current,2025-03-15 14:58:05,Transfer from Revolut user,2500,82771,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-15 14:57:47,KFC,-4690,78081,False,Food
-CARD_PAYMENT,Current,2025-03-15 21:37:30,MAXILine Töltőállomás,-19223,58858,False,Uncategorized
+CARD_PAYMENT,Current,2025-03-15 21:37:30,MAXILine Töltőállomás,-19223,58858,False,Gas
 CARD_PAYMENT,Current,2025-03-15 00:25:02,StatiON Bowling Debrecen,-29600,29258,False,Uncategorized
 TRANSFER,Current,2025-03-17 13:06:22,From Savings Account,70000,99258,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-17 10:18:31,Charlotte Tilbury,-16888,82370,False,Uncategorized
@@ -407,7 +407,7 @@ TRANSFER,Current,2025-04-10 10:53:57,Transfer to Revolut user,-60000,86573,False
 CARD_PAYMENT,Current,2025-04-09 11:37:50,Coop,-873,85700,False,Food
 CARD_PAYMENT,Current,2025-04-09 12:11:27,Simple,-793,84907,False,Uncategorized
 CARD_PAYMENT,Current,2025-04-09 10:25:39,Benu,-1849,83058,False,Uncategorized
-CARD_PAYMENT,Current,2025-04-09 10:34:25,MAXILine Töltőállomás,-22585,60473,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-09 10:34:25,MAXILine Töltőállomás,-22585,60473,False,Gas
 CARD_PAYMENT,Current,2025-04-10 18:32:32,Popbeni Kft.,-420,60053,False,Uncategorized
 CARD_PAYMENT,Current,2025-04-10 08:37:58,Coop,-1746,58307,False,Food
 CARD_PAYMENT,Current,2025-04-10 15:56:45,Nemzeti Dohánybolt,-1700,56607,False,Nemzeti Dohánybolt
@@ -502,9 +502,9 @@ TRANSFER,Current,2025-06-12 17:16:02,Mark Fodor,-1000,103705,False,Uncategorized
 TRANSFER,Current,2025-06-12 20:46:11,Transfer to Revolut user,-10000,93705,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 09:19:11,Civis Cafe Canteen,-427,93278,False,Food
 CARD_PAYMENT,Current,2025-06-12 16:18:22,Nagy Beki Pekseg,-2190,91088,False,Uncategorized
-TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,False,Uncategorized
-TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,False,Uncategorized
-TRANSFER,Current,2025-06-13 18:37:24,Transfer from Revolut user,5771,101522,False,Uncategorized
+TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,True,Uncategorized
+TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,True,Uncategorized
+TRANSFER,Current,2025-06-13 18:37:24,Transfer from Revolut user,5771,101522,True,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 16:03:43,MOL,-3198,98324,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 08:15:06,NAV,-5771,92553,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 16:43:43,Crunchyroll,-2450,90103,False,Subscriptions

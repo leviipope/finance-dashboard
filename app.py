@@ -187,13 +187,18 @@ def main():
             if st.button("Apply Changes"):
                 for idx, row in main_df_to_edit.iterrows():
                     new_category = row["Category"]
+                    new_hide_status = row["Hide"]
                     details = row["Description"]
 
                     if new_category != main_df.at[idx, "Category"]:
                         add_keyword_to_category(new_category, details)
                         main_df.at[idx, "Category"] = new_category
+                    
+                    if new_hide_status != main_df.at[idx, "Hide"]:
+                        main_df.at[idx, "Hide"] = new_hide_status
 
                 save_main_dataframe(main_df)
+                st.rerun()
 
         else:
             st.error("No data available to edit")
@@ -211,6 +216,8 @@ def main():
         st.title("Spending Analytics")
         
         main_df = load_main_dataframe()
+        main_df = main_df[main_df['Hide'] == False].copy()
+
         if main_df is not None:
             spending_df = main_df[main_df['Amount'] < 0].copy()
 
