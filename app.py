@@ -27,7 +27,13 @@ def load_statement(file):
         df = df[df["Type"] != "INTEREST"]
         df['Started Date'] = pd.to_datetime(df['Started Date'])
         df = df.rename(columns={"Started Date": "Date"})
-        df["Hide"] = False
+
+        df["Hide"] = False 
+        df.loc[df['Description'].str.startswith('To HUF'), 'Hide'] = True
+        df.loc[df['Description'] == 'Transfer from Revolut user', 'Hide'] = True
+        df.loc[(df['Product'] == 'Current') & (df['Description'] == 'From Savings Account'), 'Hide'] = True
+        df.loc[(df['Product'] == 'Current') & (df['Description'] == 'To Savings Account'), 'Hide'] = True
+
         df['Amount'] = df['Amount'].round().astype(int)
 
         try:
@@ -58,6 +64,12 @@ def load_main_dataframe():
     except FileNotFoundError:
         st.write("Could not find main_dataframe.csv")
         return None
+
+def load_main_spending_dataframe():
+    main_df = load_main_dataframe()
+    main_df = main_df[main_df['Hide'] == False].copy()
+    main_df = main_df[main_df['Product'] != 'Deposit']
+    return main_df
 
 def merge_dataframes(main_df, new_df):
     combined_df = pd.concat([main_df, new_df]).drop_duplicates(subset=['Date', 'Description', 'Amount'], keep='last')
@@ -216,8 +228,7 @@ def main():
     if page == "Spending Analytics":
         st.title("Spending Analytics")
         
-        main_df = load_main_dataframe()
-        main_df = main_df[main_df['Hide'] == False].copy()
+        main_df = load_main_spending_dataframe()
 
         if main_df is not None:
             spending_df = main_df[main_df['Amount'] < 0].copy()
@@ -283,7 +294,8 @@ def main():
                     x='Date',
                     y='Balance',
                     title='Account Balance Over Time',
-                    markers=True
+                    markers=True,
+                    hover_data={'Description': True}
                 )
                 st.plotly_chart(fig_balance_over_time, use_container_width=True)
             else:

@@ -11,10 +11,10 @@
 - bug: categorization works in df, not mirrored in csv ✅
 - implement categories 😭 ✅
     - single transaction categoryizing feature
-    - bug: after pressing apply, you need to manually reload the page for the categorization
     - bug: when adding a complete new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
+- filter comes over from Customize data tab
 - only include data that isnt hide=True ✅
 - date filter ✅
 - total spending with color gradient 🚧
@@ -26,8 +26,10 @@
     - when individual is select, make two graphs, the right one adds up transactions over time
     - highlight unusual spikes
 - list of biggest transactions in a month (top 10/15)
+    - user can input any number, displays description and amount, checkbox for date(default is false) 
 - daily spend heatmap?
 - balance over time 🚧 (its still missing something)
+    - at each datapoint (when hovering) show deatils value ✅
 
 ### Debits page
 - savings account balance over time
