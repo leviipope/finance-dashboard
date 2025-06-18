@@ -26,11 +26,10 @@
         - ✅ weekly: format amount value on bar
     - ✅ spending add-up over time
     - ✅ highlight unusual spikes
-- list of biggest transactions in a month (top 10/15)
-    - user can input any number, displays description and amount, checkbox for date(default is false) 
+- ✅ list of biggest transactions in a month (top 10/15)
 - ✅ daily spend heatmap
-    - format hover data on all graphs like on this one
-- balance over time 🚧 (its still missing something)
+    - ✅ format hover data on all graphs like on this one
+- 🚧 balance over time (its still missing something)
     - ✅ at each datapoint (when hovering) show deatils value
 
 ### Debits page

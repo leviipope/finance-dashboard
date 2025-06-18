@@ -455,31 +455,51 @@ def main():
                 
                 st.plotly_chart(fig_weekly_spending, use_container_width=True)
 
-            # Spending add-up over time
-            individual_spending = filtered_spending_df.copy()
-            individual_spending['Amount'] = individual_spending['Amount'].abs()
-            individual_spending = individual_spending.sort_values(by='Date')
-            individual_spending['CumSum'] = individual_spending['Amount'].cumsum()
-            fig_spending_add_up = px.line(
-                individual_spending,
-                x='Date',
-                y='CumSum',
-                title='Cumulative Spending Over Time',
-                markers=True,
-                hover_data={'Description': True}
-            )
-            fig_spending_add_up.update_layout(
-                yaxis_title=None,
-                xaxis_title='Date',
-            )
-            fig_spending_add_up.update_traces(
-                marker=dict(size=7),
-                hovertemplate='Date: %{x}<br>Total: %{y}<br>Description: %{customdata[0]}<extra></extra>'
-            )
-            fig_spending_add_up.update_traces(customdata=individual_spending[['Description']].values)
-            st.plotly_chart(fig_spending_add_up, use_container_width=True)
+            # Spending add-up over time and top 10 transactions
+            col1, col2 = st.columns([3,2])
+            with col1:
+                individual_spending = filtered_spending_df.copy()
+                individual_spending['Amount'] = individual_spending['Amount'].abs()
+                individual_spending = individual_spending.sort_values(by='Date')
+                individual_spending['CumSum'] = individual_spending['Amount'].cumsum()
+                fig_spending_add_up = px.line(
+                    individual_spending,
+                    x='Date',
+                    y='CumSum',
+                    title='Cumulative Spending Over Time',
+                    markers=True,
+                    hover_data={'Description': True}
+                )
+                fig_spending_add_up.update_layout(
+                    yaxis_title=None,
+                    xaxis_title='Date',
+                )
+                fig_spending_add_up.update_traces(
+                    marker=dict(size=7),
+                    hovertemplate='Date: %{x}<br>Total: %{y}<br>Description: %{customdata[0]}<extra></extra>'
+                )
+                fig_spending_add_up.update_traces(customdata=individual_spending[['Description']].values)
+                st.plotly_chart(fig_spending_add_up, use_container_width=True)
+
+            with col2:
+                top_10_spending = filtered_spending_df.copy()
+                top_10_spending['Amount'] = top_10_spending['Amount'].abs()
+                top_10_spending = top_10_spending.sort_values(by='Amount', ascending=False).head(10)
 
 
+                col1, _, col2 = st.columns([2, 1, 1])
+                with col1:
+                    st.markdown("<h6>10 Largest Transactions</h6>", unsafe_allow_html=True)
+                with col2:
+                    show_dates_checkbox = st.checkbox("Show Dates")
+
+                if show_dates_checkbox:
+                    st.dataframe(top_10_spending[['Description', 'Amount', 'Date']], hide_index=True)
+                else:
+                    st.dataframe(top_10_spending[['Description', 'Amount']], hide_index=True)
+
+
+                
                 
 
             
