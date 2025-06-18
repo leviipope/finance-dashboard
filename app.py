@@ -297,6 +297,9 @@ def main():
                     markers=True,
                     hover_data={'Description': True}
                 )
+                fig_balance_over_time.update_traces(
+                    hovertemplate='Date: %{x}<br>Balance: %{y}<br>Description: %{customdata[0]}<extra></extra>'
+                )
                 st.plotly_chart(fig_balance_over_time, use_container_width=True)
             else:
                 st.write("No 'Current' account balance data to display for the selected period.")
@@ -309,19 +312,33 @@ def main():
                 )
 
             if spending_ot_selector == "Individual Transactions":
-                daily_spending_detailed = filtered_spending_df.copy()
-                daily_spending_detailed['Amount'] = daily_spending_detailed['Amount'].abs()
-                daily_spending_detailed = daily_spending_detailed.sort_values(by='Date')
+                individual_spending = filtered_spending_df.copy()
+                individual_spending['Amount'] = individual_spending['Amount'].abs()
+                individual_spending = individual_spending.sort_values(by='Date')
+                
+                threshold = individual_spending['Amount'].quantile(0.9)
+                individual_spending['Color'] = individual_spending['Amount'].apply(
+                    lambda x: 'red' if x >= threshold else 'white'
+                )
 
                 fig_daily_spending = px.scatter(
-                    daily_spending_detailed,
+                    individual_spending,
                     x='Date',
                     y='Amount',
                     title='Individual Spending Over Time',
-                    hover_data={'Description': True}
+                    hover_data={'Description': True, 'Color': False},
+                    color='Color',
+                    color_discrete_map={'red': "#FF5A3D", 'white': '#FFFFFF'}
                 )
-                fig_daily_spending.update_traces(marker=dict(size=7, color='white'))
-                fig_daily_spending.update_layout(yaxis_type="log",xaxis=dict(nticks=20))
+                fig_daily_spending.update_traces(
+                    marker=dict(size=7),
+                    hovertemplate='Date: %{x}<br>Amount: %{y}<br>Description: %{customdata[0]}<extra></extra>'
+                )
+                fig_daily_spending.update_layout(
+                    yaxis_type="log",
+                    xaxis=dict(nticks=20),
+                    showlegend=False
+                )
                 st.plotly_chart(fig_daily_spending, use_container_width=True)
 
             if spending_ot_selector == "Daily":
@@ -339,7 +356,8 @@ def main():
                 fig_daily_spending.update_traces(
                     marker=dict(size=7,color='white'),
                     textposition='bottom center',
-                    textfont=dict(size=14, color='white')
+                    textfont=dict(size=14, color='white'),
+                    hovertemplate='Date: %{x}<br>Amount: %{y}<extra></extra>'
                 )
                 fig_daily_spending.update_layout(
                     yaxis_type="log",
@@ -350,6 +368,119 @@ def main():
                     )
                 )
                 st.plotly_chart(fig_daily_spending, use_container_width=True)
+
+                if st.checkbox("Show heatmap"):
+                    daily_spending['Date'] = pd.to_datetime(daily_spending['Date'])
+                    daily_spending['Day_of_Week'] = daily_spending['Date'].dt.day_name()
+                    daily_spending['Week'] = daily_spending['Date'].dt.isocalendar().week
+                    daily_spending['Month'] = daily_spending['Date'].dt.strftime('%Y-%m')
+                    
+                    sorted_months = sorted(daily_spending['Month'].unique())
+                    
+                    num_months = len(sorted_months)
+                    if num_months == 1:
+                        cols = st.columns([1, 1])  # Half screen
+                        col_positions = [0]
+                    elif num_months == 2:
+                        cols = st.columns(2)  # Side by side
+                        col_positions = [0, 1]
+                    elif num_months == 3:
+                        cols = st.columns(2)  # Three columns
+                        col_positions = [0, 1, 0]
+                    elif num_months == 4:
+                        cols = st.columns(2)  # 2x2 layout
+                        col_positions = [0, 1, 0, 1]
+                    else:
+                        cols = st.columns(2)  # 2x3 layout
+                        col_positions = [i % 2 for i in range(num_months)]
+                    
+                    for i, month in enumerate(sorted_months):
+                        month_data = daily_spending[daily_spending['Month'] == month]
+                        
+                        heatmap_data = month_data.pivot_table(
+                            index='Week',
+                            columns='Day_of_Week',
+                            values='Amount',
+                            fill_value=0
+                        )
+                        
+                        day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                        heatmap_data = heatmap_data.reindex(columns=day_order, fill_value=0)
+                        
+                        fig_heatmap_daily = px.imshow(
+                            heatmap_data,
+                            color_continuous_scale=[[0, '#2F2F2F'], [0.1, '#8B0000'], [1, '#FF0000']],
+                            title=f'\t\t\t\t\tDaily Spending Heatmap - {month}',
+                            aspect='equal'
+                        )
+                        fig_heatmap_daily.update_layout(
+                            xaxis_title=None,
+                            yaxis_title='Week of Year',
+                            xaxis=dict(tickmode='array', tickvals=list(range(len(day_order))), ticktext=day_order),
+                            yaxis=dict(tickmode='linear', dtick=1),
+                            plot_bgcolor='#1E1E1E',
+                            paper_bgcolor='#1E1E1E',
+                            font=dict(color='white')
+                        )
+                        fig_heatmap_daily.update_traces(
+                            hovertemplate='Day: %{x}<br>Week: %{y}<br>Amount: %{z:.0f} Ft<extra></extra>'
+                        )
+
+                        with cols[col_positions[i]]:
+                            st.plotly_chart(fig_heatmap_daily, use_container_width=True)
+                    
+
+            if spending_ot_selector == "Weekly":
+                weekly_spending = filtered_spending_df.copy()
+                weekly_spending['Amount'] = weekly_spending['Amount'].abs()
+                weekly_spending['Week'] = weekly_spending['Date'].dt.to_period('W').dt.start_time
+                weekly_spending = weekly_spending.groupby('Week')['Amount'].sum().reset_index()
+                weekly_spending = weekly_spending.sort_values(by='Week')
+                weekly_spending['Amount_Label'] = weekly_spending['Amount'].apply(
+                    lambda x: f'{x/1000:.0f}k' if x >= 1000 else f'{x:.0f}'
+                )
+                fig_weekly_spending = px.bar(
+                    weekly_spending,
+                    x='Week',
+                    y='Amount',
+                    title='Weekly Spending',
+                    text='Amount_Label',
+                    labels={'Week': 'Week', 'Amount': 'Weekly Spending (Ft)'},
+                )
+                fig_weekly_spending.update_traces(
+                    textposition='inside',
+                    textfont=dict(size=18, color='black'),
+                    hovertemplate='Week: %{x}<br>Weekly Spending: %{y}<extra></extra>'
+                )
+                
+                st.plotly_chart(fig_weekly_spending, use_container_width=True)
+
+            # Spending add-up over time
+            individual_spending = filtered_spending_df.copy()
+            individual_spending['Amount'] = individual_spending['Amount'].abs()
+            individual_spending = individual_spending.sort_values(by='Date')
+            individual_spending['CumSum'] = individual_spending['Amount'].cumsum()
+            fig_spending_add_up = px.line(
+                individual_spending,
+                x='Date',
+                y='CumSum',
+                title='Cumulative Spending Over Time',
+                markers=True,
+                hover_data={'Description': True}
+            )
+            fig_spending_add_up.update_layout(
+                yaxis_title=None,
+                xaxis_title='Date',
+            )
+            fig_spending_add_up.update_traces(
+                marker=dict(size=7),
+                hovertemplate='Date: %{x}<br>Total: %{y}<br>Description: %{customdata[0]}<extra></extra>'
+            )
+            fig_spending_add_up.update_traces(customdata=individual_spending[['Description']].values)
+            st.plotly_chart(fig_spending_add_up, use_container_width=True)
+
+
+                
 
             
 main()
