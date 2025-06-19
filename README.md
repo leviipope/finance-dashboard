@@ -11,7 +11,7 @@
 - ✅ bug: categorization works in df, not mirrored in csv
 - ✅ implement categories 😭 
     - single transaction categoryizing feature
-    - bug: when adding a complete new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
+    - ✅ bug: when adding a completly new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
 - filter comes over from Customize data tab

@@ -214,7 +214,7 @@ def main():
                 st.rerun()
 
         else:
-            st.error("No data available to edit")
+            st.error("No data available to edit, please upload a CSV file.")
 
         col1, _ = st.columns([1, 2])
 
@@ -224,6 +224,13 @@ def main():
                 new_df = load_statement(upload_file)
                 updated_df = merge_dataframes(main_df, new_df)
                 save_main_dataframe(updated_df)
+                
+        if upload_file is not None:
+            st.toast("Data successfully uploaded! Refresh the page", icon="🔄")
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.success("Data successfully uploaded! Refresh the page!")
+
 
     if page == "Spending Analytics":
         st.title("Spending Analytics")

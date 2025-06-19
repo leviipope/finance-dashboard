@@ -53,7 +53,7 @@ CARD_PAYMENT,Current,2025-05-15 13:05:40,Ryanair,-73952,79149,False,Travel
 TRANSFER,Current,2025-05-16 16:37:07,Anett Moldován,-2000,77135,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-16 17:06:21,MOL,-24397,52738,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-16 15:55:45,Simple,-550,52188,False,Uncategorized
-CARD_PAYMENT,Current,2025-05-18 22:57:15,Spotify,-1090,51098,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-18 22:57:15,Spotify,-1090,51098,False,Subscriptions
 TRANSFER,Current,2025-05-19 11:09:04,LEVENTE NANDOR POLGARI,-5000,46063,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-18 19:40:04,Nemzeti Dohánybolt,-1700,44363,False,Nemzeti Dohánybolt
 TRANSFER,Current,2025-05-21 07:57:57,Transfer from Revolut user,50000,94363,True,Uncategorized
@@ -155,7 +155,7 @@ CARD_PAYMENT,Current,2025-01-16 09:36:44,Civis Cafe Canteen,-115,209164,False,Fo
 CARD_PAYMENT,Current,2025-01-17 20:58:14,Wolt,-3729,205435,False,Food
 CARD_PAYMENT,Current,2025-01-17 16:28:00,Nemzeti Dohánybolt,-1800,203635,False,Nemzeti Dohánybolt
 CARD_PAYMENT,Current,2025-01-17 16:36:30,CBA,-2346,201289,False,Uncategorized
-CARD_PAYMENT,Current,2025-01-18 21:57:17,Spotify,-1090,200199,False,Uncategorized
+CARD_PAYMENT,Current,2025-01-18 21:57:17,Spotify,-1090,200199,False,Subscriptions
 TRANSFER,Current,2025-01-19 20:28:12,Transfer to Revolut user,-2800,197399,False,Uncategorized
 TRANSFER,Current,2025-01-19 20:28:34,Transfer to Revolut user,-25000,172399,False,Uncategorized
 TRANSFER,Current,2025-01-19 20:28:52,Transfer from Revolut user,25000,197399,True,Uncategorized
@@ -236,7 +236,7 @@ CARD_PAYMENT,Current,2025-02-15 15:43:35,Nemzeti Dohánybolt,-1700,55367,False,N
 CARD_PAYMENT,Current,2025-02-16 00:43:05,MAXILine Töltőállomás,-10068,45299,False,Gas
 TOPUP,Current,2025-02-17 17:14:15,Top-Up by *7109,4000,49299,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-17 16:37:55,Lidl,-5069,44230,False,Food
-CARD_PAYMENT,Current,2025-02-18 21:57:13,Spotify,-1090,43140,False,Uncategorized
+CARD_PAYMENT,Current,2025-02-18 21:57:13,Spotify,-1090,43140,False,Subscriptions
 CARD_PAYMENT,Current,2025-02-18 15:45:40,HELLA AUTOTECHNIK NOVA s.r.o.,-430,42710,False,Food
 CARD_PAYMENT,Current,2025-02-18 09:35:21,Debreceni Egyetem,-470,42240,False,Uncategorized
 CARD_PAYMENT,Current,2025-02-18 11:37:31,"Diagnostic Sport, Lifestyle and Therapy Center",-13000,29240,False,Uncategorized
@@ -338,7 +338,7 @@ TRANSFER,Current,2025-03-17 13:06:22,From Savings Account,70000,99258,True,Uncat
 CARD_PAYMENT,Current,2025-03-17 10:18:31,Charlotte Tilbury,-16888,82370,False,Uncategorized
 TRANSFER,Current,2025-03-18 12:59:57,Transfer from Revolut user,1000,83370,True,Uncategorized
 CARD_PAYMENT,Current,2025-03-17 15:51:22,Simple,-816,82554,False,Uncategorized
-CARD_PAYMENT,Current,2025-03-18 21:57:19,Spotify,-1090,81464,False,Uncategorized
+CARD_PAYMENT,Current,2025-03-18 21:57:19,Spotify,-1090,81464,False,Subscriptions
 CARD_PAYMENT,Current,2025-03-18 12:00:56,Simple,-595,80869,False,Uncategorized
 CARD_PAYMENT,Current,2025-03-18 17:52:42,Simple,-209,80660,False,Uncategorized
 TRANSFER,Current,2025-03-20 17:49:58,Transfer from Revolut user,55,80715,True,Uncategorized
@@ -426,7 +426,7 @@ CARD_PAYMENT,Current,2025-04-15 13:37:44,Coop,-1346,47082,False,Food
 CARD_PAYMENT,Current,2025-04-15 17:54:40,Simple,-209,46873,False,Uncategorized
 CARD_PAYMENT,Current,2025-04-16 20:18:07,Tesco,-3569,43304,False,Uncategorized
 CARD_PAYMENT,Current,2025-04-16 11:32:56,Nemzeti Dohánybolt,-1700,41604,False,Nemzeti Dohánybolt
-CARD_PAYMENT,Current,2025-04-18 22:57:22,Spotify,-1090,40514,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-18 22:57:22,Spotify,-1090,40514,False,Subscriptions
 CARD_PAYMENT,Current,2025-04-19 11:33:14,Nemzeti Dohánybolt,-4163,36351,False,Nemzeti Dohánybolt
 TRANSFER,Savings,2025-01-05 15:16:16,To HUF Dentist,50000,50000,True,Uncategorized
 TRANSFER,Savings,2025-01-20 12:58:03,To HUF Temp,450000,500000,True,Uncategorized
@@ -463,6 +463,8 @@ TRANSFER,Deposit,2025-04-02 10:25:26,From Savings Account,-20000,180153,False,Un
 TRANSFER,Deposit,2025-04-06 19:20:23,From Savings Account,-20000,160174,False,Uncategorized
 TRANSFER,Deposit,2025-04-08 13:50:35,To Savings Account,40000,200183,False,Uncategorized
 TRANSFER,Deposit,2025-04-08 15:06:06,To Savings Account,100000,300183,False,Uncategorized
+TRANSFER,Savings,2025-06-12 08:16:10,To HUF,-60000,0,True,Uncategorized
+TRANSFER,Savings,2025-06-12 08:16:22,Closing transaction,0,0,False,Uncategorized
 TRANSFER,Deposit,2025-06-10 09:27:02,From Savings Account,-21000,309757,False,Uncategorized
 TRANSFER,Deposit,2025-06-12 08:18:56,To Savings Account,21000,330774,False,Uncategorized
 CARD_PAYMENT,Current,2025-05-31 21:05:08,Tippmixpro,-1500,58975,False,Entertainment
@@ -502,15 +504,17 @@ TRANSFER,Current,2025-06-12 17:16:02,Mark Fodor,-1000,103705,False,Uncategorized
 TRANSFER,Current,2025-06-12 20:46:11,Transfer to Revolut user,-10000,93705,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 09:19:11,Civis Cafe Canteen,-427,93278,False,Food
 CARD_PAYMENT,Current,2025-06-12 16:18:22,Nagy Beki Pekseg,-2190,91088,False,Food
-TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,True,Uncategorized
-TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,True,Uncategorized
+TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,False,Uncategorized
+TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,False,Uncategorized
 TRANSFER,Current,2025-06-13 18:37:24,Transfer from Revolut user,5771,101522,True,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 16:03:43,MOL,-3198,98324,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-12 08:15:06,NAV,-5771,92553,True,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 08:15:06,NAV,-5771,92553,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-12 16:43:43,Crunchyroll,-2450,90103,False,Subscriptions
 CARD_PAYMENT,Current,2025-06-13 13:30:40,Nemzeti Dohánybolt,-1227,88876,False,Nemzeti Dohánybolt
 CARD_PAYMENT,Current,2025-06-14 12:52:41,Nemzeti Dohánybolt,-2492,86384,False,Nemzeti Dohánybolt
 TRANSFER,Current,2025-06-15 11:43:22,Anett Moldován,-1800,84571,False,Uncategorized
 TRANSFER,Current,2025-06-15 13:50:15,Anett Moldován,-2000,82557,False,Uncategorized
-TRANSFER,Savings,2025-06-12 08:16:10,To HUF,-60000,0,True,Uncategorized
-TRANSFER,Savings,2025-06-12 08:16:22,Closing transaction,0,0,False,Uncategorized
+TOPUP,Current,2025-06-18 10:27:58,Top-Up by *7109,20000,102557,False,Uncategorized
+TOPUP,Current,2025-06-18 22:11:24,Top-Up by *7109,4900,107457,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-18 07:37:00,Civis Cafe Canteen,-817,106640,False,Food
+CARD_PAYMENT,Current,2025-06-18 22:57:20,Spotify,-1090,105550,False,Subscriptions
