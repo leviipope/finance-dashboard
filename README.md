@@ -16,6 +16,7 @@
 
 ### Credits page
 - filter comes over from Customize data tab
+- monthly spending metrics
 - ✅ only include data that isnt hide=True
 - ✅ date filter
 - ✅ total spending with color gradient
