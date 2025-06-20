@@ -2,7 +2,7 @@
 
 ### Main page
 - ✅ Make editable dataframe functionable
-    - make the amount column editable
+    - ✅ make the amount column editable
 - ✅ Filtering options:
     - ✅ filter by date
     - ✅ filter by type

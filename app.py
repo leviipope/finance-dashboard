@@ -187,13 +187,15 @@ def main():
             ]
 
             filtered_df = categorize_transactions(filtered_df)
+            filtered_df = filtered_df.sort_values(by='Date', ascending=False)
 
-            column_config = {col: st.column_config.Column(col, disabled=True) for col in filtered_df.columns if col != 'Hide'}
+            column_config = {col: st.column_config.Column(col, disabled=True) for col in filtered_df.columns if col not in ['Hide', 'Amount']}
             column_config['Category'] = st.column_config.SelectboxColumn(
                 "Category",
                 options=list(st.session_state.categories.keys())
             )
             column_config['Hide'] = st.column_config.CheckboxColumn('Hide')
+            column_config['Amount'] = st.column_config.NumberColumn('Amount')
 
             main_df_to_edit = st.data_editor(filtered_df, column_config=column_config)
 
@@ -201,6 +203,7 @@ def main():
                 for idx, row in main_df_to_edit.iterrows():
                     new_category = row["Category"]
                     new_hide_status = row["Hide"]
+                    new_amount = row["Amount"]
                     details = row["Description"]
 
                     if new_category != main_df.at[idx, "Category"]:
@@ -209,6 +212,9 @@ def main():
                     
                     if new_hide_status != main_df.at[idx, "Hide"]:
                         main_df.at[idx, "Hide"] = new_hide_status
+                    
+                    if new_amount != main_df.at[idx, "Amount"]:
+                        main_df.at[idx, "Amount"] = new_amount
 
                 main_df = categorize_transactions(main_df)
                 save_main_dataframe(main_df)
