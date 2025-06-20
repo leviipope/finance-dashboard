@@ -518,3 +518,34 @@ TOPUP,Current,2025-06-18 10:27:58,Top-Up by *7109,20000,102557,False,Uncategoriz
 TOPUP,Current,2025-06-18 22:11:24,Top-Up by *7109,4900,107457,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-18 07:37:00,Civis Cafe Canteen,-817,106640,False,Food
 CARD_PAYMENT,Current,2025-06-18 22:57:20,Spotify,-1090,105550,False,Subscriptions
+TRANSFER,Savings,2025-04-28 11:59:52,To HUF Holidays,60000,200000,True,Uncategorized
+CARD_PAYMENT,Current,2025-04-22 07:00:43,Nagy Beki Pekseg,-1670,34681,False,Food
+CARD_PAYMENT,Current,2025-04-23 07:48:28,Civis Cafe Canteen,-1147,33534,False,Food
+CARD_PAYMENT,Current,2025-04-23 09:38:53,Civis Catering,-450,33084,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-23 15:19:27,Coop,-2379,30705,False,Food
+CARD_PAYMENT,Current,2025-04-24 08:57:01,Apple,-6190,24515,False,Subscriptions
+TRANSFER,Current,2025-04-25 21:30:28,Transfer from Revolut user,30000,54515,True,Uncategorized
+CARD_PAYMENT,Current,2025-04-25 09:13:15,Nemzeti Dohánybolt,-2020,52495,False,Nemzeti Dohánybolt
+CARD_PAYMENT,Current,2025-04-25 20:14:43,StatiON Bowling Debrecen,-1320,51175,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-25 16:00:32,Simple,-909,50266,False,Uncategorized
+TRANSFER,Current,2025-04-26 15:51:26,Transfer from Revolut user,1640,51906,True,Uncategorized
+TRANSFER,Current,2025-04-26 16:34:11,Transfer from Revolut user,30000,81906,True,Uncategorized
+CARD_PAYMENT,Current,2025-04-25 15:49:35,Nemzeti Dohánybolt,-3400,78506,False,Nemzeti Dohánybolt
+TOPUP,Current,2025-04-26 21:00:18,Top-Up by *7109,11000,89506,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-26 15:49:38,Zeusz Gyros Bar,-3280,86226,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-26 01:50:21,Debreczeni Csaphaz,-1920,84306,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-26 00:53:09,Debreczeni Csaphaz,-1920,82386,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-25 22:29:52,Debreczeni Csaphaz,-2460,79926,False,Uncategorized
+TOPUP,Current,2025-04-27 11:48:20,Top-Up by *7109,10000,89926,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-26 16:39:14,Orlen,-23057,66869,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-26 14:41:57,HelloPay,-1300,65569,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-25 21:30:35,StatiON Bowling Debrecen,-29600,35969,False,Uncategorized
+TOPUP,Current,2025-04-27 14:28:09,Top-Up by *7109,8000,43969,False,Uncategorized
+TRANSFER,Current,2025-04-28 07:45:33,Transfer from Revolut user,110000,153969,True,Uncategorized
+TRANSFER,Current,2025-04-28 11:11:56,Anett Moldován,-109200,44005,False,Uncategorized
+TOPUP,Current,2025-04-28 11:47:34,Top-Up by *7109,68000,112005,False,Uncategorized
+TRANSFER,Current,2025-04-28 11:59:52,To HUF Holidays,-60000,52005,True,Uncategorized
+TRANSFER,Current,2025-04-28 20:51:01,Transfer from Revolut user,1790,53795,True,Uncategorized
+TRANSFER,Current,2025-04-29 10:01:56,Transfer to Revolut user,-20000,33795,False,Uncategorized
+CARD_PAYMENT,Current,2025-04-28 20:13:47,KFC,-3580,30215,False,Food
+CARD_PAYMENT,Current,2025-04-29 09:14:18,Coop,-1999,28216,False,Food

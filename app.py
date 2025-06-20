@@ -72,8 +72,9 @@ def load_main_spending_dataframe():
     return main_df
 
 def merge_dataframes(main_df, new_df):
-    combined_df = pd.concat([main_df, new_df]).drop_duplicates(subset=['Date', 'Description', 'Amount'], keep='last')
-    return combined_df
+    combined_df = pd.concat([main_df, new_df]).drop_duplicates(subset=['Date', 'Description', 'Balance'], keep='first')
+    num_new_rows = len(combined_df) - len(main_df)
+    return combined_df, num_new_rows
 
 def save_main_dataframe(df):
     df.to_csv(MAIN_DATAFRAME_FILE, index=False)
@@ -222,15 +223,14 @@ def main():
             upload_file = st.file_uploader("Upload your new Revolut statement", type=["csv"])
             if upload_file is not None:
                 new_df = load_statement(upload_file)
-                updated_df = merge_dataframes(main_df, new_df)
+                updated_df, num_new_rows = merge_dataframes(main_df, new_df)
                 save_main_dataframe(updated_df)
-                
-        if upload_file is not None:
-            st.toast("Data successfully uploaded! Refresh the page", icon="🔄")
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.success("Data successfully uploaded! Refresh the page!")
 
+                if num_new_rows == 0:
+                    st.info("No new rows to merge. The main DataFrame is already up to date.")
+                else:
+                    st.info(f"Successfully added {num_new_rows} new rows into the main DataFrame. Refresh the page!")
+                    st.toast("Data successfully uploaded! Refresh the page", icon="🔄")             
 
     if page == "Spending Analytics":
         st.title("Spending Analytics")
