@@ -1,4 +1,12 @@
 # Questlog
+### PROD
+- registration for users
+    - login for users
+- changes in the files should be commited to a private github repository when button is clicked
+
+plans/help:
+https://chatgpt.com/share/685c1383-10ec-8000-b168-0757a011a0da
+https://g.co/gemini/share/dd8f704e4076
 
 ### Main page
 - ✅ Make editable dataframe functionable
