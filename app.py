@@ -5,20 +5,65 @@ import json
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.set_page_config(page_title="Revolut analysis", page_icon=":money_with_wings:", layout="wide") 
+st.set_page_config(page_title="Financial Dashboard", page_icon=":money_with_wings:", layout="wide") 
 
-MAIN_DATAFRAME_FILE = "main_dataframe.csv"
+USERS_FILE = "data/users.json"
 
-category_file = "categories.json"
-
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = None
+if "is_guest" not in st.session_state:
+    st.session_state.is_guest = False
 if "categories" not in st.session_state:
-    st.session_state.categories = {
-        "Uncategorized": []
-    }
+    st.session_state.categories = {"Uncategorized": []}
 
-if os.path.exists(category_file):
-    with open(category_file, "r") as f:
-        st.session_state.categories = json.load(f)
+def initialize_users():
+    if not os.path.exists("data"):
+        os.makedirs("data", exist_ok=True)
+    if not os.path.exists("data/categories"):
+        os.makedirs("data/categories", exist_ok=True)
+    if not os.path.exists("data/dataframes"):
+        os.makedirs("data/dataframes", exist_ok=True)
+        
+    if not os.path.exists(USERS_FILE):
+        users = {
+            "admin": {
+                "password": "123"
+            }
+        }
+        with open(USERS_FILE, "w") as f:
+            json.dump(users, f)
+
+initialize_users()
+
+def get_user_files(username):
+    if username == "admin":
+        return {
+            "dataframe": "data/dataframes/main_dataframe.csv",
+            "categories": "data/categories/categories.json"
+        }
+    else:
+        return {
+            "dataframe": f"data/dataframes/{username}_dataframe.csv",
+            "categories": f"data/categories/{username}_categories.json"
+        }
+
+def load_user_data(username):
+    if st.session_state.is_guest:
+        st.session_state.categories = {"Uncategorized": []}
+        return
+        
+    files = get_user_files(username)
+    
+    if os.path.exists(files["categories"]):
+        with open(files["categories"], "r") as f:
+            st.session_state.categories = json.load(f)
+    else:
+        st.session_state.categories = {"Uncategorized": []}
+
+if st.session_state.logged_in and st.session_state.username:
+    load_user_data(st.session_state.username)
 
 def load_statement(file):
     try: 
@@ -57,18 +102,31 @@ def load_statement(file):
         return None
 
 def load_main_dataframe():
+    if st.session_state.is_guest:
+        return None
+    
+    files = get_user_files(st.session_state.username)
     try:
-        df = pd.read_csv(MAIN_DATAFRAME_FILE)
+        df = pd.read_csv(files["dataframe"])
         df['Date'] = pd.to_datetime(df['Date'])
         return df
     except FileNotFoundError:
-        st.write("Could not find main_dataframe.csv")
+        st.write(f"Could not find {st.session_state.username}'s dataframe")
         return None
 
 def load_main_spending_dataframe():
+    if st.session_state.is_guest:
+        if 'guest_dataframe' in st.session_state:
+            main_df = st.session_state.guest_dataframe.copy()
+            main_df = main_df[main_df['Hide'] == False]
+            main_df = main_df[main_df['Product'] != 'Deposit']
+            return main_df
+        return None
+    
     main_df = load_main_dataframe()
-    main_df = main_df[main_df['Hide'] == False].copy()
-    main_df = main_df[main_df['Product'] != 'Deposit']
+    if main_df is not None:
+        main_df = main_df[main_df['Hide'] == False].copy()
+        main_df = main_df[main_df['Product'] != 'Deposit']
     return main_df
 
 def merge_dataframes(main_df, new_df):
@@ -77,10 +135,18 @@ def merge_dataframes(main_df, new_df):
     return combined_df, num_new_rows
 
 def save_main_dataframe(df):
-    df.to_csv(MAIN_DATAFRAME_FILE, index=False)
+    if st.session_state.is_guest:
+        return
+    
+    files = get_user_files(st.session_state.username)
+    df.to_csv(files["dataframe"], index=False)
 
 def save_categories():
-    with open(category_file, "w") as f:
+    if st.session_state.is_guest:
+        return
+    
+    files = get_user_files(st.session_state.username)
+    with open(files["categories"], "w") as f:
         json.dump(st.session_state.categories, f)
 
 def categorize_transactions(df):
@@ -123,12 +189,165 @@ def get_spending_color(amount):
     
     return f"rgb({r}, {g}, {b})"
 
+def login_page():
+    st.markdown(
+        """
+        <div style="text-align: center; padding: 30px 0;">
+            <h1 style="color: #4CAF50; font-size: 3.5em; margin-bottom: 10px;">Revolut Analysis Dashboard</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    tab1, tab2, tab3 = st.tabs(["Login", "Register", "👤 Guest Mode"])
+    
+    with tab1:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Login to Your Account</h3>", unsafe_allow_html=True)
+        
+        _, col2, _ = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("Username", placeholder="Enter your username", key="login_username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
+            
+            if st.button("Login", use_container_width=True, type="primary"):
+                if authenticate_user(username, password):
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.is_guest = False
+                    load_user_data(username)
+                    st.success("Login successful! Redirecting...")
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password!")
+    
+    with tab2:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Create New Account</h3>", unsafe_allow_html=True)
+        
+        _, col2, _ = st.columns([1, 2, 1])
+        with col2:
+            new_username = st.text_input("Choose Username", placeholder="Enter new username", key="reg_username")
+            new_password = st.text_input("Choose Password", type="password", placeholder="Enter new password", key="reg_password")
+            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="reg_confirm")
+            
+            if st.button("Register", use_container_width=True, type="primary"):
+                if register_user(new_username, new_password, confirm_password):
+                    st.success("Registration successful! You can now login.")
+                    st.rerun()
+    
+    with tab3:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Try as Guest</h3>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.info("🎯 **Guest Mode Features:**\n- Upload and analyze your CSV file\n- All dashboard analytics available\n- Data is temporary (not saved)")
+            st.warning("⚠️ **Note:** Your data will be lost when you close the browser!")
+            
+            if st.button("👤 Continue as Guest", use_container_width=True, type="secondary"):
+                st.session_state.logged_in = True
+                st.session_state.username = "guest"
+                st.session_state.is_guest = True
+                st.session_state.categories = {"Uncategorized": []}
+                st.success("Welcome, Guest! Please upload a CSV file to get started.")
+                st.rerun()
+
+def authenticate_user(username, password):
+    if not username or not password:
+        return False
+    
+    try:
+        with open(USERS_FILE, "r") as f:
+            users = json.load(f)
+        
+        if username in users and users[username]["password"] == password:
+            return True
+        return False
+    except FileNotFoundError:
+        return False
+
+def register_user(username, password, confirm_password):
+    if not username or not password:
+        st.error("Please fill in all fields!")
+        return False
+    
+    if password != confirm_password:
+        st.error("Passwords don't match!")
+        return False
+    
+    try:
+        with open(USERS_FILE, "r") as f:
+            users = json.load(f)
+    except FileNotFoundError:
+        users = {}
+    
+    if username in users:
+        st.error("Username already exists!")
+        return False
+    
+    if username == "guest":
+        st.error("Username 'guest' is reserved!")
+        return False
+    
+    users[username] = {
+        "password": password
+    }
+    
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f)
+    
+    return True
+
 def main():
+    if not st.session_state.logged_in:
+        login_page()
+        return
+    
+    # Sidebar with user info and logout
+    with st.sidebar:
+        if st.session_state.is_guest:
+            st.info("👤 **Guest Mode**\nData is temporary")
+        else:
+            st.success(f"👋 Welcome, **{st.session_state.username}**!")
+            if st.session_state.username == "admin":
+                st.info("🛡️ **Admin User**")
+        
+        if st.button("Logout"):
+            st.session_state.logged_in = False
+            st.session_state.username = None
+            st.session_state.is_guest = False
+            st.session_state.categories = {"Uncategorized": []}
+            st.rerun()
+        st.markdown("---")
+    
+    if st.session_state.is_guest:
+        st.title("Guest Mode - Upload Your Data")
+        
+        uploaded_file = st.file_uploader("Upload your Revolut statement to get started", type=["csv"])
+        
+        if uploaded_file is not None:
+            guest_df = load_statement(uploaded_file)
+            if guest_df is not None:
+                st.session_state.guest_dataframe = guest_df
+                st.success("File uploaded successfully! You can now use all analytics features.")
+            else:
+                st.error("Error processing the uploaded file.")
+                return
+        else:
+            st.info("Please upload a CSV file to continue with guest mode.")
+            return
+    
     page = st.sidebar.radio("Go to", ["Customize Data", "Spending Analytics", "Income Analytics"])
 
     if page == "Customize Data":
-        st.title("Main DataFrame")
-        main_df = load_main_dataframe()
+        if st.session_state.is_guest:
+            st.title("Data Customization (Guest Mode)")
+            if 'guest_dataframe' not in st.session_state:
+                st.error("No data available. Please upload a CSV file first.")
+                return
+            main_df = st.session_state.guest_dataframe.copy()
+        else:
+            st.title("Main DataFrame")
+            main_df = load_main_dataframe()
+        
         if main_df is not None:
 
             col1, _, col2, col3, _ = st.columns([5, 1, 2, 2, 3])
@@ -217,26 +436,42 @@ def main():
                         main_df.at[idx, "Amount"] = new_amount
 
                 main_df = categorize_transactions(main_df)
-                save_main_dataframe(main_df)
+                
+                if st.session_state.is_guest:
+                    st.session_state.guest_dataframe = main_df
+                    st.success("Changes applied to guest session!")
+                else:
+                    save_main_dataframe(main_df)
+                    st.success("Changes saved permanently!")
                 st.rerun()
 
         else:
-            st.error("No data available to edit, please upload a CSV file.")
+            if st.session_state.is_guest:
+                st.error("No data available. Please upload a CSV file first.")
+            else:
+                st.error("No data available to edit, please upload a CSV file.")
 
-        col1, _ = st.columns([1, 2])
+        if not st.session_state.is_guest:
+            col1, _ = st.columns([1, 2])
 
-        with col1:
-            upload_file = st.file_uploader("Upload your new Revolut statement", type=["csv"])
-            if upload_file is not None:
-                new_df = load_statement(upload_file)
-                updated_df, num_new_rows = merge_dataframes(main_df, new_df)
-                save_main_dataframe(updated_df)
+            with col1:
+                upload_file = st.file_uploader("Upload your new Revolut statement", type=["csv"])
+                if upload_file is not None:
+                    new_df = load_statement(upload_file)
+                    if new_df is not None:
+                        if main_df is not None:
+                            updated_df, num_new_rows = merge_dataframes(main_df, new_df)
+                        else:
+                            updated_df = new_df
+                            num_new_rows = len(new_df)
+                        
+                        save_main_dataframe(updated_df)
 
-                if num_new_rows == 0:
-                    st.info("No new rows to merge. The main DataFrame is already up to date.")
-                else:
-                    st.info(f"Successfully added {num_new_rows} new rows into the main DataFrame. Refresh the page!")
-                    st.toast("Data successfully uploaded! Refresh the page", icon="🔄")             
+                        if num_new_rows == 0:
+                            st.info("No new rows to merge. The main DataFrame is already up to date.")
+                        else:
+                            st.info(f"Successfully added {num_new_rows} new rows into the main DataFrame. Refresh the page!")
+                            st.toast("Data successfully uploaded! Refresh the page", icon="🔄")             
 
     if page == "Spending Analytics":
         st.title("Spending Analytics")
@@ -514,7 +749,17 @@ def main():
     if page == "Income Analytics":
         st.title("Income Analytics")
 
-        main_df = load_main_dataframe()
+        if st.session_state.is_guest:
+            if 'guest_dataframe' not in st.session_state:
+                st.error("No data available. Please upload a CSV file first.")
+                return
+            main_df = st.session_state.guest_dataframe.copy()
+        else:
+            main_df = load_main_dataframe()
+            
+        if main_df is None:
+            st.error("No data available for income analytics.")
+            return
 
         income_df = main_df[main_df['Amount'] > 0].copy()
         income_df = income_df[income_df['Hide'] == False]

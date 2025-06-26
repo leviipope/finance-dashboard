@@ -1,0 +1,77 @@
+Type,Product,Date,Description,Amount,Balance,Hide,Category
+TRANSFER,Savings,2025-06-12 08:16:10,To HUF,-60000,0,True,Uncategorized
+TRANSFER,Savings,2025-06-12 08:16:22,Closing transaction,0,0,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-31 21:05:08,Tippmixpro,-1500,58975,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-31 19:42:12,KFC,-2490,56485,False,Uncategorized
+TRANSFER,Current,2025-06-01 14:34:37,Transfer to Revolut user,-2000,54485,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-31 23:10:09,McDonald's,-6040,48445,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-31 23:10:56,McDonald's,-4025,44420,False,Uncategorized
+CARD_PAYMENT,Current,2025-05-31 23:29:53,Nemzeti Dohánybolt,-899,43521,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-01 23:56:58,Epic Games Store,-749,42772,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-01 22:18:37,Steam,-369,42400,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-03 09:17:38,Simple,-244,42156,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-03 07:34:13,HELL Energy,-430,41726,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-04 11:37:09,Civis Cafe Canteen,-2376,39350,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-04 09:26:49,1605021531 Gfa It,-550,38800,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-04 16:36:00,Auchan,-2928,35872,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-05 19:53:16,Tippmixpro,-1500,34372,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-06 19:25:48,Smash Burger & Beer Bar Debrecen,-5980,28392,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-06 18:13:41,Nemzeti Dohánybolt,-2100,26292,False,Uncategorized
+TRANSFER,Current,2025-06-07 16:26:17,Transfer from Revolut user,2000,28292,True,Uncategorized
+TRANSFER,Current,2025-06-07 16:26:51,Transfer from Revolut user,900,29192,True,Uncategorized
+TOPUP,Current,2025-06-07 16:36:02,Top-Up by *7109,4000,33192,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-07 16:31:56,Harap Lak,-6270,26922,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-07 18:53:13,Harap Lak,-1400,25522,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-07 14:11:37,Kerekestelepi Termálfürdő és Kemping,-5400,20122,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-08 00:54:12,Tippmixpro,-3000,17122,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-08 09:39:35,Tippmixpro,-17121,1,False,Uncategorized
+TRANSFER,Current,2025-06-10 09:27:02,From Savings Account,21000,21001,True,Uncategorized
+TRANSFER,Current,2025-06-10 09:27:39,Transfer to Revolut user,-20000,1001,False,Uncategorized
+TOPUP,Current,2025-06-10 11:11:38,Top-Up by *7109,265000,266001,False,Uncategorized
+TRANSFER,Current,2025-06-10 15:22:47,Transfer from Revolut user,26000,292001,True,Uncategorized
+TRANSFER,Current,2025-06-10 16:15:08,Zéti Polgári,-25500,266322,False,Uncategorized
+ATM,Current,2025-06-10 18:11:56,"Cash at Sarand, Nagy U. 50.",-50000,216322,False,Uncategorized
+TRANSFER,Current,2025-06-12 08:16:10,To HUF,60000,276322,True,Uncategorized
+TRANSFER,Current,2025-06-12 08:18:56,To Savings Account,-21000,255322,True,Uncategorized
+EXCHANGE,Current,2025-06-12 08:51:05,Exchange to EUR,-150610,104712,False,Uncategorized
+TRANSFER,Current,2025-06-12 17:16:02,Mark Fodor,-1000,103705,False,Uncategorized
+TRANSFER,Current,2025-06-12 20:46:11,Transfer to Revolut user,-10000,93705,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 09:19:11,Civis Cafe Canteen,-427,93278,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 16:18:22,Nagy Beki Pekseg,-2190,91088,False,Uncategorized
+TRANSFER,Current,2025-06-13 13:13:25,Mark Fodor,-5300,85751,False,Uncategorized
+TOPUP,Current,2025-06-13 17:10:19,Top-Up by *7109,10000,95751,False,Uncategorized
+TRANSFER,Current,2025-06-13 18:37:24,Transfer from Revolut user,5771,101522,True,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 16:03:43,MOL,-3198,98324,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 08:15:06,NAV,-5771,92553,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-12 16:43:43,Crunchyroll,-2450,90103,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-13 13:30:40,Nemzeti Dohánybolt,-1227,88876,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-14 12:52:41,Nemzeti Dohánybolt,-2492,86384,False,Uncategorized
+TRANSFER,Current,2025-06-15 11:43:22,Anett Moldován,-1800,84571,False,Uncategorized
+TRANSFER,Current,2025-06-15 13:50:15,Anett Moldován,-2000,82557,False,Uncategorized
+TOPUP,Current,2025-06-18 10:27:58,Top-Up by *7109,20000,102557,False,Uncategorized
+TOPUP,Current,2025-06-18 22:11:24,Top-Up by *7109,4900,107457,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-18 07:37:00,Civis Cafe Canteen,-817,106640,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-18 22:57:20,Spotify,-1090,105550,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-18 19:04:27,KFC,-8960,96590,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-18 21:52:53,Tesco,-2196,94394,False,Uncategorized
+TRANSFER,Current,2025-06-19 23:26:24,Transfer from Revolut user,4000,98394,True,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 08:13:56,Civis Cafe Canteen,-934,97460,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 11:52:13,Civis Cafe Canteen,-2502,94958,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 19:21:21,Apollo Cinema,-4340,90618,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 18:25:48,McDonald's,-720,89898,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 18:09:57,McDonald's,-6150,83748,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 16:02:47,Simple,-910,82838,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-19 18:54:47,Apolló Mozi,-4950,77888,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-20 18:30:07,Alza,-12880,65008,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 20:19:12,KFC,-2490,62518,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 16:28:06,Margherita Ristorante,-850,61668,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 13:43:11,Margherita Ristorante,-1350,60318,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 15:38:28,Margherita Ristorante,-450,59868,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-20 22:15:36,Nemzeti Dohánybolt,-3248,56620,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 11:00:59,Kerekestelepi Termálfürdő és Kemping,-2700,53920,False,Uncategorized
+TRANSFER,Current,2025-06-22 16:36:33,Mark Fodor,-900,53014,False,Uncategorized
+TOPUP,Current,2025-06-23 21:06:37,Top-Up by *7109,6500,59514,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-24 16:18:18,MAXILine Töltőállomás,-10116,49398,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-25 13:45:37,Nemzeti Dohánybolt,-379,49019,False,Uncategorized
+TRANSFER,Deposit,2025-06-10 09:27:02,From Savings Account,-21000,309757,False,Uncategorized
+TRANSFER,Deposit,2025-06-12 08:18:56,To Savings Account,21000,330774,False,Uncategorized

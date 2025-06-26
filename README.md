@@ -1,7 +1,6 @@
 # Questlog
 ### PROD
-- registration for users
-    - login for users
+- ✅ login/registration for users
 - changes in the files should be commited to a private github repository when button is clicked
 
 plans/help:
