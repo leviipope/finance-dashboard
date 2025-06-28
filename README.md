@@ -1,6 +1,6 @@
 # Finance Dashboard
 
-A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits.
+A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits. Currently only works with Revolut.
 
 ## Features
 - 🔐 User authentication with password encryption
@@ -10,13 +10,7 @@ A personal finance dashboard built with Streamlit that tracks spending, categori
 - 📱 Mobile-friendly responsive design
 
 ## Demo
-🚀 **Live App**: [Your Streamlit Cloud URL will be here]
-
-## Local Development
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Create `.streamlit/secrets.toml` with your GitHub credentials
-4. Run: `streamlit run app.py`
+🚀 **Live App**: https://revolut-data-analysis.streamlit.app
 
 ## Deployment
 This app is deployed on Streamlit Cloud with data stored securely in a private GitHub repository.
@@ -25,10 +19,9 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
 - ✅ login/registration for users
 - ✅ password encryption
 - ✅ changes committed to private GitHub repository
-- ✅ log file functionality
+- 🚧 log file
 - 🚧 user data deletion option
-
-// ...rest of existing content...
+- 🚧 user data encryption
 
 # Questlog
 ### PROD
@@ -38,11 +31,7 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
     - ✅ everytime a change is made should there be a commit
 - log file
 - user data deletion option
-
-
-plans/help:
-https://chatgpt.com/share/685c1383-10ec-8000-b168-0757a011a0da
-https://g.co/gemini/share/dd8f704e4076
+- user data encyption
 
 ### Main page
 - ✅ Make editable dataframe functionable
@@ -78,4 +67,6 @@ https://g.co/gemini/share/dd8f704e4076
 ### Debits page
 - ✅ savings account balance over time
 - ✅ last months income as metric
-- ✅how much of your monthly income did you save?
+- ✅ how much of your monthly income did you save?
+
+### 🚧 How to use / About / Feedback / Contact page

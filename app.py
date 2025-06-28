@@ -656,7 +656,7 @@ def main():
                         st.metric(
                             label=month_data['Date'].strftime('%B %Y'),
                             value=month_data['Amount_Label'],
-                            delta = int(monthly_spending.iloc[i]['Amount'] - (monthly_spending.iloc[i+1]['Amount'] if i+1 < len(monthly_spending) else 0)),
+                            delta = f"{int(monthly_spending.iloc[i]['Amount'] - (monthly_spending.iloc[i+1]['Amount'] if i+1 < len(monthly_spending) else 0))} Ft",
                             delta_color = "inverse"
                         )
                 else:
