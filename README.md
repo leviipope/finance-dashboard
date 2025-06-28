@@ -22,8 +22,7 @@ https://g.co/gemini/share/dd8f704e4076
     - ✅ bug: when adding a completly new bank statement (with no categories.json and main_dataframe.csv), pressing apply amounts to an error
 
 ### Credits page
-- filter comes over from Customize data tab
-- monthly spending metrics
+- ✅ monthly spending metrics
 - ✅ only include data that isnt hide=True
 - ✅ date filter
 - ✅ total spending with color gradient

@@ -527,6 +527,30 @@ def main():
             if st.checkbox("Show all spending data"):
                 st.dataframe(filtered_spending_df)
 
+            # Monthly spending metrics
+            col1, col2, col3 = st.columns(3)
+            monthly_spending = filtered_spending_df.copy()
+            monthly_spending['Date'] = monthly_spending['Date'].dt.to_period('M').dt.to_timestamp()
+            monthly_spending = monthly_spending.groupby('Date')['Amount'].sum().reset_index()
+            monthly_spending['Amount'] = monthly_spending['Amount'].abs()
+            monthly_spending = monthly_spending.sort_values(by='Date', ascending=False)
+            monthly_spending['Amount_Label'] = monthly_spending['Amount'].apply(
+                lambda x: f'{x/1000:.0f}k Ft' if x >= 1000 else f'{x:.0f} Ft'
+            )
+            for i in range(3):
+                if i < len(monthly_spending):
+                    month_data = monthly_spending.iloc[i]
+                    with col1 if i == 0 else col2 if i == 1 else col3:
+                        st.metric(
+                            label=month_data['Date'].strftime('%B %Y'),
+                            value=month_data['Amount_Label'],
+                            delta = int(monthly_spending.iloc[i]['Amount'] - (monthly_spending.iloc[i+1]['Amount'] if i+1 < len(monthly_spending) else 0)),
+                            delta_color = "inverse"
+                        )
+                else:
+                    with col1 if i == 0 else col2 if i == 1 else col3:
+                        st.metric(label="No data", value="0 Ft", delta="0 Ft")
+
             # Balance over time line chart
             balance_chart_data = main_df[
                 (main_df['Product'] == 'Current') &
