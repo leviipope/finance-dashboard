@@ -212,9 +212,9 @@ def save_main_dataframe(df):
     success = write_github_file(files["dataframe"], csv_content, commit_message)
     
     if success:
-        st.success("✅ Data saved to GitHub!")
+        st.success("✅ Data saved")
     else:
-        st.error("❌ Failed to save data to GitHub")
+        st.error("❌ Failed to save data")
 
 def save_categories():
     if st.session_state.is_guest:
@@ -227,9 +227,9 @@ def save_categories():
     success = write_github_file(files["categories"], categories_content, commit_message)
     
     if success:
-        st.success("✅ Categories saved to GitHub!")
+        st.success("✅ Categories saved")
     else:
-        st.error("❌ Failed to save categories to GitHub")
+        st.error("❌ Failed to save categorie")
 
 def categorize_transactions(df):
     df["Category"] = "Uncategorized"
