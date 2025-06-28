@@ -1,3 +1,35 @@
+# Finance Dashboard
+
+A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits.
+
+## Features
+- 🔐 User authentication with password encryption
+- 📊 Interactive spending analytics and visualizations
+- 🏷️ Automatic transaction categorization
+- 💾 Cloud data storage via private GitHub repository
+- 📱 Mobile-friendly responsive design
+
+## Demo
+🚀 **Live App**: [Your Streamlit Cloud URL will be here]
+
+## Local Development
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Create `.streamlit/secrets.toml` with your GitHub credentials
+4. Run: `streamlit run app.py`
+
+## Deployment
+This app is deployed on Streamlit Cloud with data stored securely in a private GitHub repository.
+
+### PROD Status
+- ✅ login/registration for users
+- ✅ password encryption
+- ✅ changes committed to private GitHub repository
+- ✅ log file functionality
+- 🚧 user data deletion option
+
+// ...rest of existing content...
+
 # Questlog
 ### PROD
 - ✅ login/registration for users
