@@ -26,6 +26,7 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
 # Questlog
 ### Known bugs
 - currency is HUF everwhere -> make it universal
+- convert welcome message in sidebar to a st.toast() instead (and maybe even the failed to upload x rows st.warning() too)
 
 ### PROD
 - ✅ login/registration for users
