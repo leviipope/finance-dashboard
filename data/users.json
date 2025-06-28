@@ -1,1 +1,8 @@
-{"admin": {"password": "123"}}
+{
+    "admin": {
+        "password": "60349379a3c90619ef9cf2d178c8af860749047567d48b1ce652fd53f4b75137a77bbec2a35999b3e2a6bd18984645f6"
+    },
+    "test": {
+        "password": "62a4fe56dbbf0d442350e703d0af6e0492e7feaff06009780118d6fc9915b9540ab3eb491046fd2f285446a950d31354"
+    }
+}

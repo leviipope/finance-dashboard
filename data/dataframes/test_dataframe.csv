@@ -63,15 +63,15 @@ CARD_PAYMENT,Current,2025-06-19 18:09:57,McDonald's,-6150,83748,False,Uncategori
 CARD_PAYMENT,Current,2025-06-19 16:02:47,Simple,-910,82838,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-19 18:54:47,Apolló Mozi,-4950,77888,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-20 18:30:07,Alza,-12880,65008,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-21 20:19:12,KFC,-2490,62518,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-21 16:28:06,Margherita Ristorante,-850,61668,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-21 13:43:11,Margherita Ristorante,-1350,60318,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-21 15:38:28,Margherita Ristorante,-450,59868,False,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 20:19:12,KFC,-2490,62518,True,Uncategorized
+CARD_PAYMENT,Current,2025-06-21 16:28:06,Margherita Ristorante,-850,61668,False,LOL
+CARD_PAYMENT,Current,2025-06-21 13:43:11,Margherita Ristorante,-1350,60318,False,LOL
+CARD_PAYMENT,Current,2025-06-21 15:38:28,Margherita Ristorante,-450,59868,False,LOL
 CARD_PAYMENT,Current,2025-06-20 22:15:36,Nemzeti Dohánybolt,-3248,56620,False,Uncategorized
 CARD_PAYMENT,Current,2025-06-21 11:00:59,Kerekestelepi Termálfürdő és Kemping,-2700,53920,False,Uncategorized
-TRANSFER,Current,2025-06-22 16:36:33,Mark Fodor,-900,53014,False,Uncategorized
-TOPUP,Current,2025-06-23 21:06:37,Top-Up by *7109,6500,59514,False,Uncategorized
-CARD_PAYMENT,Current,2025-06-24 16:18:18,MAXILine Töltőállomás,-10116,49398,False,Uncategorized
+TRANSFER,Current,2025-06-22 16:36:33,Mark Fodor,-900,53014,True,Uncategorized
+TOPUP,Current,2025-06-23 21:06:37,Top-Up by *7109,6500,59514,True,Uncategorized
+CARD_PAYMENT,Current,2025-06-24 16:18:18,MAXILine Töltőállomás,-10116,49398,False,LOL
 CARD_PAYMENT,Current,2025-06-25 13:45:37,Nemzeti Dohánybolt,-379,49019,False,Uncategorized
 TRANSFER,Deposit,2025-06-10 09:27:02,From Savings Account,-21000,309757,False,Uncategorized
 TRANSFER,Deposit,2025-06-12 08:18:56,To Savings Account,21000,330774,False,Uncategorized

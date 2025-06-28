@@ -4,6 +4,9 @@ import os
 import json
 import matplotlib.pyplot as plt
 import plotly.express as px
+import hashlib
+import secrets
+import time
 
 st.set_page_config(page_title="Financial Dashboard", page_icon=":money_with_wings:", layout="wide") 
 
@@ -25,15 +28,6 @@ def initialize_users():
         os.makedirs("data/categories", exist_ok=True)
     if not os.path.exists("data/dataframes"):
         os.makedirs("data/dataframes", exist_ok=True)
-        
-    if not os.path.exists(USERS_FILE):
-        users = {
-            "admin": {
-                "password": "123"
-            }
-        }
-        with open(USERS_FILE, "w") as f:
-            json.dump(users, f)
 
 initialize_users()
 
@@ -258,8 +252,10 @@ def authenticate_user(username, password):
         with open(USERS_FILE, "r") as f:
             users = json.load(f)
         
-        if username in users and users[username]["password"] == password:
-            return True
+        if username in users:
+            stored_password = users[username]["password"]
+            return verify_password(stored_password, password)
+        
         return False
     except FileNotFoundError:
         return False
@@ -287,21 +283,40 @@ def register_user(username, password, confirm_password):
         st.error("Username 'guest' is reserved!")
         return False
     
+    hashed_password = hash_password(password)
     users[username] = {
-        "password": password
+        "password": hashed_password
     }
     
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f)
-    
-    return True
+    try:
+        with open(USERS_FILE, "w") as f:
+            json.dump(users, f, indent=4, sort_keys=True)
+        
+        st.success(f"🎉 Registration successful! Welcome {username}")
+        st.balloons()
+        time.sleep(3)
+        
+        return True
+    except Exception as e:
+        st.error(f"Error saving user data: {str(e)}")
+        return False
+
+def hash_password(password):
+    salt = secrets.token_hex(16)
+    password_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return salt + password_hash.hex()
+
+def verify_password(stored_password, provided_password):
+    salt = stored_password[:32]
+    stored_hash = stored_password[32:]
+    password_hash = hashlib.pbkdf2_hmac('sha256', provided_password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return stored_hash == password_hash.hex()
 
 def main():
     if not st.session_state.logged_in:
         login_page()
         return
     
-    # Sidebar with user info and logout
     with st.sidebar:
         if st.session_state.is_guest:
             st.info("👤 **Guest Mode**\nData is temporary")

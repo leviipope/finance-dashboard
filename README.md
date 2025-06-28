@@ -1,6 +1,7 @@
 # Questlog
 ### PROD
 - ✅ login/registration for users
+- ✅ password encyption
 - changes in the files should be commited to a private github repository when button is clicked
 
 plans/help:
