@@ -24,6 +24,9 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
 - 🚧 user data encryption
 
 # Questlog
+### Known bugs
+- currency is HUF everwhere -> make it universal
+
 ### PROD
 - ✅ login/registration for users
 - ✅ password encyption
@@ -49,6 +52,7 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
 
 ### Credits page
 - ✅ monthly spending metrics
+    - spending for specific month metric
 - ✅ only include data that isnt hide=True
 - ✅ date filter
 - ✅ total spending with color gradient
