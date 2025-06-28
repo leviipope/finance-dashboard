@@ -2,7 +2,8 @@
 ### PROD
 - ✅ login/registration for users
 - ✅ password encyption
-- changes in the files should be commited to a private github repository when button is clicked
+- ✅ changes in the files should be commited to a private github repository when button is clicked
+    - ✅ everytime a change is made should there be a commit
 
 plans/help:
 https://chatgpt.com/share/685c1383-10ec-8000-b168-0757a011a0da

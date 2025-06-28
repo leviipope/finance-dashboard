@@ -7,10 +7,83 @@ import plotly.express as px
 import hashlib
 import secrets
 import time
+from github import Github
+import base64
+from datetime import datetime
 
 st.set_page_config(page_title="Financial Dashboard", page_icon=":money_with_wings:", layout="wide") 
 
-USERS_FILE = "data/users.json"
+GITHUB_TOKEN = st.secrets.get("github", {}).get("token")
+GITHUB_REPO_OWNER = st.secrets.get("github", {}).get("repo_owner")
+GITHUB_REPO_NAME = st.secrets.get("github", {}).get("repo_name")
+GITHUB_BRANCH = st.secrets.get("github", {}).get("branch", "main")
+
+github_client = None
+github_repo = None
+
+if GITHUB_TOKEN and GITHUB_REPO_OWNER and GITHUB_REPO_NAME:
+    try:
+        github_client = Github(GITHUB_TOKEN)
+        github_repo = github_client.get_repo(f"{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}")
+    except Exception as e:
+        st.error(f"Error connecting to GitHub: {str(e)}")
+
+def ensure_github_file_exists(file_path, default_content="{}"):
+    if not github_repo:
+        return False
+    
+    try: 
+        github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+        return True
+    except:
+        try:
+            github_repo.create_file(
+                file_path,
+                f"Initialize {file_path}",
+                default_content,
+                branch=GITHUB_BRANCH
+            )
+            return True
+        except Exception as e:
+            st.error(f"Failed to create {file_path}: {str(e)}")
+            return False
+        
+def read_github_file(file_path):
+    if not github_repo:
+        return None
+    
+    try:
+        file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+        content = base64.b64decode(file_content.content).decode('utf-8')
+        return content
+    except:
+        return None
+    
+def write_github_file(file_path, content, commit_message):
+    if not github_repo:
+        return False
+    
+    try:
+        try:
+            file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+            github_repo.update_file(
+                file_path,
+                commit_message,
+                content,
+                file_content.sha,
+                branch=GITHUB_BRANCH
+            )
+        except:
+            github_repo.create_file(
+                file_path,
+                commit_message,
+                content,
+                branch=GITHUB_BRANCH
+            )
+        return True
+    except Exception as e:
+        st.error(f"Failed to write {file_path}: {str(e)}")
+        return False
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -20,16 +93,6 @@ if "is_guest" not in st.session_state:
     st.session_state.is_guest = False
 if "categories" not in st.session_state:
     st.session_state.categories = {"Uncategorized": []}
-
-def initialize_users():
-    if not os.path.exists("data"):
-        os.makedirs("data", exist_ok=True)
-    if not os.path.exists("data/categories"):
-        os.makedirs("data/categories", exist_ok=True)
-    if not os.path.exists("data/dataframes"):
-        os.makedirs("data/dataframes", exist_ok=True)
-
-initialize_users()
 
 def get_user_files(username):
     if username == "admin":
@@ -50,10 +113,14 @@ def load_user_data(username):
         
     files = get_user_files(username)
     
-    if os.path.exists(files["categories"]):
-        with open(files["categories"], "r") as f:
-            st.session_state.categories = json.load(f)
+    categories_content = read_github_file(files["categories"])
+    if categories_content:
+        try:
+            st.session_state.categories = json.loads(categories_content)
+        except:
+            st.session_state.categories = {"Uncategorized": []}
     else:
+        ensure_github_file_exists(files["categories"], json.dumps({"Uncategorized": []}))
         st.session_state.categories = {"Uncategorized": []}
 
 if st.session_state.logged_in and st.session_state.username:
@@ -100,12 +167,18 @@ def load_main_dataframe():
         return None
     
     files = get_user_files(st.session_state.username)
-    try:
-        df = pd.read_csv(files["dataframe"])
-        df['Date'] = pd.to_datetime(df['Date'])
-        return df
-    except FileNotFoundError:
-        st.write(f"Could not find {st.session_state.username}'s dataframe")
+    csv_content = read_github_file(files["dataframe"])
+    
+    if csv_content:
+        try:
+            from io import StringIO
+            df = pd.read_csv(StringIO(csv_content))
+            df['Date'] = pd.to_datetime(df['Date'])
+            return df
+        except Exception as e:
+            st.error(f"Error loading dataframe: {str(e)}")
+            return None
+    else:
         return None
 
 def load_main_spending_dataframe():
@@ -133,15 +206,30 @@ def save_main_dataframe(df):
         return
     
     files = get_user_files(st.session_state.username)
-    df.to_csv(files["dataframe"], index=False)
+    csv_content = df.to_csv(index=False)
+    
+    commit_message = f"Update dataframe for user {st.session_state.username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    success = write_github_file(files["dataframe"], csv_content, commit_message)
+    
+    if success:
+        st.success("✅ Data saved to GitHub!")
+    else:
+        st.error("❌ Failed to save data to GitHub")
 
 def save_categories():
     if st.session_state.is_guest:
         return
     
     files = get_user_files(st.session_state.username)
-    with open(files["categories"], "w") as f:
-        json.dump(st.session_state.categories, f)
+    categories_content = json.dumps(st.session_state.categories, indent=2)
+    
+    commit_message = f"Update categories for user {st.session_state.username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    success = write_github_file(files["categories"], categories_content, commit_message)
+    
+    if success:
+        st.success("✅ Categories saved to GitHub!")
+    else:
+        st.error("❌ Failed to save categories to GitHub")
 
 def categorize_transactions(df):
     df["Category"] = "Uncategorized"
@@ -248,17 +336,18 @@ def authenticate_user(username, password):
     if not username or not password:
         return False
     
-    try:
-        with open(USERS_FILE, "r") as f:
-            users = json.load(f)
-        
-        if username in users:
-            stored_password = users[username]["password"]
-            return verify_password(stored_password, password)
-        
-        return False
-    except FileNotFoundError:
-        return False
+    users_content = read_github_file("data/users.json")
+    
+    if users_content:
+        try:
+            users = json.loads(users_content)
+            if username in users:
+                stored_password = users[username]["password"]
+                return verify_password(stored_password, password)
+        except:
+            pass
+    
+    return False
 
 def register_user(username, password, confirm_password):
     if not username or not password:
@@ -269,36 +358,40 @@ def register_user(username, password, confirm_password):
         st.error("Passwords don't match!")
         return False
     
-    try:
-        with open(USERS_FILE, "r") as f:
-            users = json.load(f)
-    except FileNotFoundError:
-        users = {}
+    if username == "guest":
+        st.error("Username 'guest' is reserved!")
+        return False
+    
+    users_content = read_github_file("data/users.json")
+    users = {}
+    
+    if users_content:
+        try:
+            users = json.loads(users_content)
+        except:
+            users = {}
     
     if username in users:
         st.error("Username already exists!")
         return False
     
-    if username == "guest":
-        st.error("Username 'guest' is reserved!")
-        return False
-    
     hashed_password = hash_password(password)
     users[username] = {
-        "password": hashed_password
+        "password": hashed_password,
+        "created_at": datetime.now().isoformat()
     }
     
-    try:
-        with open(USERS_FILE, "w") as f:
-            json.dump(users, f, indent=4, sort_keys=True)
-        
+    users_content = json.dumps(users, indent=2)
+    commit_message = f"Register new user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    success = write_github_file("data/users.json", users_content, commit_message)
+    
+    if success:
         st.success(f"🎉 Registration successful! Welcome {username}")
         st.balloons()
         time.sleep(3)
-        
         return True
-    except Exception as e:
-        st.error(f"Error saving user data: {str(e)}")
+    else:
+        st.error("Failed to register user. Please try again.")
         return False
 
 def hash_password(password):
@@ -316,6 +409,10 @@ def main():
     if not st.session_state.logged_in:
         login_page()
         return
+    
+    if not github_repo and not st.session_state.is_guest:
+        st.error("⚠️ GitHub storage not configured. Running in offline mode.")
+        st.info("💡 Configure GitHub secrets to enable data persistence.")
     
     with st.sidebar:
         if st.session_state.is_guest:
