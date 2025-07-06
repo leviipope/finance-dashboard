@@ -10,6 +10,9 @@ import time
 from github import Github
 import base64
 from datetime import datetime
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 st.set_page_config(page_title="Financial Dashboard", page_icon=":money_with_wings:", layout="wide") 
 
@@ -28,6 +31,68 @@ if GITHUB_TOKEN and GITHUB_REPO_OWNER and GITHUB_REPO_NAME:
     except Exception as e:
         st.error(f"Error connecting to GitHub: {str(e)}")
 
+def derive_key_from_password(username, password_hash):
+    """Derive encryption key from username and password hash"""
+    salt = username.encode('utf-8')[:16].ljust(16, b'0')  # Use username as salt, pad to 16 bytes
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(password_hash.encode('utf-8')))
+    return key
+
+def encrypt_data(data, key):
+    """Encrypt data using Fernet encryption"""
+    fernet = Fernet(key)
+    encrypted_data = fernet.encrypt(data.encode('utf-8'))
+    return base64.b64encode(encrypted_data).decode('utf-8')
+
+def decrypt_data(encrypted_data, key):
+    """Decrypt data using Fernet encryption"""
+    try:
+        fernet = Fernet(key)
+        decoded_data = base64.b64decode(encrypted_data.encode('utf-8'))
+        decrypted_data = fernet.decrypt(decoded_data)
+        return decrypted_data.decode('utf-8')
+    except Exception as e:
+        st.error(f"Failed to decrypt data: {str(e)}")
+        return None
+
+def is_encrypted_data(data):
+    """Check if data appears to be encrypted (base64 encoded)"""
+    try:
+        # Check if it's valid base64 and has the right length
+        if len(data) % 4 != 0:
+            return False
+        decoded = base64.b64decode(data.encode('utf-8'))
+        # Encrypted data should be longer and have specific patterns
+        return len(decoded) > 50
+    except Exception:
+        return False
+
+def get_user_encryption_key(username):
+    """Get the encryption key for a user"""
+    if username == "admin":
+        return None  # Admin data is not encrypted
+    
+    # Only get encryption key for the currently logged-in user
+    if not st.session_state.get("username") or st.session_state.username != username:
+        return None
+    
+    # Get user's password hash from the database
+    users_content = read_github_file("data/users.json")
+    if users_content:
+        try:
+            users = json.loads(users_content)
+            if username in users:
+                password_hash = users[username]["password"]
+                return derive_key_from_password(username, password_hash)
+        except Exception:
+            pass
+    return None
+
 def ensure_github_file_exists(file_path, default_content="{}"):
     if not github_repo:
         return False
@@ -35,12 +100,23 @@ def ensure_github_file_exists(file_path, default_content="{}"):
     try: 
         github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
         return True
-    except:
+    except Exception:
         try:
+            # For non-admin users, encrypt the default content only for their own files
+            final_content = default_content
+            if (st.session_state.get("username") and 
+                st.session_state.username != "admin" and 
+                st.session_state.username != "guest" and
+                st.session_state.username in file_path):  # Only encrypt if it's the user's own file
+                
+                encryption_key = get_user_encryption_key(st.session_state.username)
+                if encryption_key:
+                    final_content = encrypt_data(default_content, encryption_key)
+            
             github_repo.create_file(
                 file_path,
                 f"Initialize {file_path}",
-                default_content,
+                final_content,
                 branch=GITHUB_BRANCH
             )
             return True
@@ -57,6 +133,46 @@ def read_github_file(file_path):
         content = base64.b64decode(file_content.content).decode('utf-8')
         return content
     except:
+        return None
+
+def read_encrypted_github_file(file_path, username):
+    """Read and decrypt a GitHub file for a specific user"""
+    if not github_repo:
+        return None
+    
+    # Only process files for the currently logged-in user or admin
+    if not st.session_state.get("username") or (
+        st.session_state.username != username and 
+        st.session_state.username != "admin" and 
+        username != "admin"
+    ):
+        return None
+    
+    try:
+        file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+        content = base64.b64decode(file_content.content).decode('utf-8')
+        
+        # If admin, return content as-is (not encrypted)
+        if username == "admin":
+            return content
+        
+        # Check if the content is already encrypted
+        if not is_encrypted_data(content):
+            # Content is not encrypted (probably default content like "{}")
+            return content
+        
+        # For regular users, decrypt the content
+        encryption_key = get_user_encryption_key(username)
+        if encryption_key:
+            decrypted_data = decrypt_data(content, encryption_key)
+            if decrypted_data is not None:
+                return decrypted_data
+            else:
+                # Decryption failed, might be unencrypted legacy data
+                return content
+        else:
+            return None
+    except Exception:
         return None
     
 def write_github_file(file_path, content, commit_message):
@@ -84,6 +200,29 @@ def write_github_file(file_path, content, commit_message):
     except Exception as e:
         st.error(f"Failed to write {file_path}: {str(e)}")
         return False
+
+def write_encrypted_github_file(file_path, content, commit_message, username):
+    """Encrypt and write a GitHub file for a specific user"""
+    if not github_repo:
+        return False
+    
+    # Only allow writing for the currently logged-in user
+    if not st.session_state.get("username") or st.session_state.username != username:
+        return False
+    
+    # If admin, save content as-is (not encrypted)
+    if username == "admin":
+        final_content = content
+    else:
+        # For regular users, encrypt the content
+        encryption_key = get_user_encryption_key(username)
+        if encryption_key:
+            final_content = encrypt_data(content, encryption_key)
+        else:
+            st.error("Unable to get encryption key for user")
+            return False
+    
+    return write_github_file(file_path, final_content, commit_message)
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -113,7 +252,7 @@ def load_user_data(username):
         
     files = get_user_files(username)
     
-    categories_content = read_github_file(files["categories"])
+    categories_content = read_encrypted_github_file(files["categories"], username)
     if categories_content:
         try:
             st.session_state.categories = json.loads(categories_content)
@@ -167,7 +306,7 @@ def load_main_dataframe():
         return None
     
     files = get_user_files(st.session_state.username)
-    csv_content = read_github_file(files["dataframe"])
+    csv_content = read_encrypted_github_file(files["dataframe"], st.session_state.username)
     
     if csv_content:
         try:
@@ -209,7 +348,7 @@ def save_main_dataframe(df):
     csv_content = df.to_csv(index=False)
     
     commit_message = f"Update dataframe for user {st.session_state.username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    success = write_github_file(files["dataframe"], csv_content, commit_message)
+    success = write_encrypted_github_file(files["dataframe"], csv_content, commit_message, st.session_state.username)
     
     if success:
         st.success("✅ Data saved")
@@ -224,12 +363,7 @@ def save_categories():
     categories_content = json.dumps(st.session_state.categories, indent=2)
     
     commit_message = f"Update categories for user {st.session_state.username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    success = write_github_file(files["categories"], categories_content, commit_message)
-    
-    if success:
-        st.success("✅ Categories saved")
-    else:
-        st.error("❌ Failed to save categorie")
+    success = write_encrypted_github_file(files["categories"], categories_content, commit_message, st.session_state.username)
 
 def categorize_transactions(df):
     df["Category"] = "Uncategorized"
@@ -338,7 +472,7 @@ def register_user(username, password, confirm_password):
     if success:
         st.success(f"🎉 Registration successful! Welcome {username}")
         st.balloons()
-        time.sleep(3)
+        time.sleep(1)
         return True
     else:
         st.error("Failed to register user. Please try again.")
@@ -473,7 +607,8 @@ def login_page():
             
             if st.button("Register", use_container_width=True, type="primary"):
                 if register_user(new_username, new_password, confirm_password):
-                    st.success("Registration successful! You can now login.")
+                    st.success("You can now login!")
+                    time.sleep(3)
                     st.rerun()
     
     with tab3:
@@ -648,7 +783,8 @@ def main():
                     st.success("Changes applied to guest session!")
                 else:
                     save_main_dataframe(main_df)
-                    st.success("Changes saved permanently!")
+                    st.success("Changes saved permanently! Refreshing...")
+                    time.sleep(2)
                 st.rerun()
 
         else:
@@ -677,7 +813,8 @@ def main():
                             st.info("No new rows to merge. The main DataFrame is already up to date.")
                         else:
                             st.info(f"Successfully added {num_new_rows} new rows into the main DataFrame. Refresh the page!")
-                            st.toast("Data successfully uploaded! Refresh the page", icon="🔄")             
+                            st.info("Due to streamlits limitations, you will be asked to login again!")
+                            st.toast("Data successfully uploaded! Refresh the page and login", icon="🔄")             
 
     if page == "Spending Analytics":
         st.title("Spending Analytics")
