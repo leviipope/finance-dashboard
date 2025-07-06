@@ -962,6 +962,48 @@ def main():
                     with col1 if i == 0 else col2 if i == 1 else col3:
                         st.metric(label="No data", value="0 Ft", delta="0 Ft")
 
+            if st.checkbox("Show spending for specific month(s)"):
+                col1, col2, _ = st.columns([1, 1, 3])
+                with col1:
+                    year_options = spending_df['Date'].dt.year.unique()
+                    selected_years = st.multiselect("Select Years", options=sorted(year_options, reverse=True))
+                with col2:
+                    month_options = list(range(1, 13))
+                    month_names = [pd.Timestamp(2000, i, 1).strftime('%B') for i in month_options]
+                    selected_months = st.multiselect("Select Months", 
+                                                   options=month_options,
+                                                   format_func=lambda x: month_names[x-1])
+                
+                if selected_years and selected_months:
+                    selected_spending = []
+                    selected_labels = []
+                    
+                    for year in selected_years:
+                        for month in selected_months:
+                            month_data = spending_df[
+                                (spending_df['Date'].dt.year == year) & 
+                                (spending_df['Date'].dt.month == month)
+                            ]
+                            spending_amount = abs(month_data['Amount'].sum())
+                            selected_spending.append(spending_amount)
+                            
+                            month_name = pd.Timestamp(year, month, 1).strftime('%B %Y')
+                            selected_labels.append(month_name)
+                    
+                    num_results = len(selected_spending)
+                    rows_needed = (num_results + 2) // 3
+                    
+                    for row in range(rows_needed):
+                        cols = st.columns(3)
+                        for col_idx in range(3):
+                            result_idx = row * 3 + col_idx
+                            if result_idx < num_results:
+                                with cols[col_idx]:
+                                    st.metric(
+                                        label=selected_labels[result_idx],
+                                        value=f"{selected_spending[result_idx]:,.0f} Ft"
+                                    )
+
             # Balance over time line chart
             balance_chart_data = main_df[
                 (main_df['Product'] == 'Current') &
@@ -1245,7 +1287,7 @@ def main():
                     delta=f"{((monthly_savings[i] - (monthly_savings[i + 1] if i + 1 < len(monthly_savings) else 0)) / previous_income * 100):.1f}%"
                 )
 
-        if st.checkbox("Show income for specific months"):
+        if st.checkbox("Show income for specific month(s)"):
             col1, col2, _ = st.columns([1, 1, 3])
             with col1:
                 year_options = income_df['Date'].dt.year.unique()

@@ -45,7 +45,7 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 
 ### Credits page
 - ✅ monthly spending metrics
-    - spending for specific month metric
+    - ✅ spending for specific month metric
 - ✅ only include data that isnt hide=True
 - ✅ date filter
 - ✅ total spending with color gradient
