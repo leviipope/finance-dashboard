@@ -627,6 +627,74 @@ def login_page():
                 st.success("Welcome, Guest! Please upload a CSV file to get started.")
                 st.rerun()
 
+def delete_user_data(username):
+    """Delete all user data including categories, dataframe, and user account"""
+    if not username or username == "admin":
+        return False, "Cannot delete admin user or invalid username"
+    
+    if not github_repo:
+        return False, "GitHub storage not configured"
+    
+    try:
+        files = get_user_files(username)
+        errors = []
+        
+        # Delete user's dataframe file
+        try:
+            file_content = github_repo.get_contents(files["dataframe"], ref=GITHUB_BRANCH)
+            github_repo.delete_file(
+                files["dataframe"],
+                f"Delete dataframe for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                file_content.sha,
+                branch=GITHUB_BRANCH
+            )
+        except Exception as e:
+            if "Not Found" not in str(e):
+                errors.append(f"Failed to delete dataframe: {str(e)}")
+        
+        # Delete user's categories file
+        try:
+            file_content = github_repo.get_contents(files["categories"], ref=GITHUB_BRANCH)
+            github_repo.delete_file(
+                files["categories"],
+                f"Delete categories for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                file_content.sha,
+                branch=GITHUB_BRANCH
+            )
+        except Exception as e:
+            if "Not Found" not in str(e):
+                errors.append(f"Failed to delete categories: {str(e)}")
+        
+        # Remove user from users.json
+        users_content = read_github_file("data/users.json")
+        if users_content:
+            try:
+                users = json.loads(users_content)
+                if username in users:
+                    del users[username]
+                    updated_users_content = json.dumps(users, indent=2)
+                    success = write_github_file(
+                        "data/users.json", 
+                        updated_users_content, 
+                        f"Delete user account: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    )
+                    if not success:
+                        errors.append("Failed to update users.json")
+                else:
+                    errors.append("User not found in users.json")
+            except Exception as e:
+                errors.append(f"Failed to process users.json: {str(e)}")
+        else:
+            errors.append("Users.json not found")
+        
+        if errors:
+            return False, "; ".join(errors)
+        else:
+            return True, "User data deleted successfully"
+            
+    except Exception as e:
+        return False, f"Unexpected error: {str(e)}"
+
 def main():
     # Initialize session state for change password page
     if "show_change_password" not in st.session_state:
@@ -676,7 +744,7 @@ def main():
             st.info("Please upload a CSV file to continue with guest mode.")
             return
     
-    page = st.sidebar.radio("Go to", ["Customize Data", "Spending Analytics", "Income Analytics"])
+    page = st.sidebar.radio("Go to", ["Customize Data", "Spending Analytics", "Income Analytics", "User Settings"])
 
     if page == "Customize Data":
         if st.session_state.is_guest:
@@ -1229,6 +1297,107 @@ def main():
             hovertemplate='Date: %{x}<br>Balance: %{y}<extra></extra>'
         )
         st.plotly_chart(fig_savings, use_container_width=True)
+
+    if page == "User Settings":
+        st.title("User Settings")
+        
+        if st.session_state.is_guest:
+            st.info("👤 **Guest Mode**")
+            st.write("Guest users don't have persistent data to manage. Your data is temporary and will be cleared when you close the browser.")
+            return
+        
+        st.markdown("### Account Management")
+        
+        # User info
+        st.info(f"**Current User:** {st.session_state.username}")
+        
+        # Change Password Section
+        st.markdown("#### Change Password")
+        with st.expander("🔐 Change Your Password"):
+            col1, col2 = st.columns(2)
+            with col1:
+                old_password = st.text_input("Current Password", type="password", key="settings_old_password")
+                new_password = st.text_input("New Password", type="password", key="settings_new_password")
+                confirm_new_password = st.text_input("Confirm New Password", type="password", key="settings_confirm_password")
+            
+            if st.button("Update Password", type="primary"):
+                if change_password(st.session_state.username, old_password, new_password, confirm_new_password):
+                    st.success("Password updated successfully!")
+                    time.sleep(2)
+                    st.rerun()
+        
+        st.markdown("---")
+        
+        # Data Management Section
+        st.markdown("#### Data Management")
+        
+        # Show data info
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Your Data:**")
+            files = get_user_files(st.session_state.username)
+            
+            # Check if files exist
+            dataframe_exists = read_encrypted_github_file(files["dataframe"], st.session_state.username) is not None
+            categories_exists = read_encrypted_github_file(files["categories"], st.session_state.username) is not None
+            
+            if dataframe_exists:
+                st.write("✅ Transaction data")
+            else:
+                st.write("❌ No transaction data")
+            
+            if categories_exists:
+                st.write("✅ Categories data")
+                st.write(f"📊 {len(st.session_state.categories)} categories configured")
+            else:
+                st.write("❌ No categories data")
+        
+        with col2:
+            st.markdown("**Storage Location:**")
+            st.write(f"📁 Dataframe: `{files['dataframe']}`")
+            st.write(f"📁 Categories: `{files['categories']}`")
+            st.write(f"🔐 Data is encrypted with your password")
+        
+        st.markdown("---")
+        
+        # Danger Zone
+        st.markdown("#### ⚠️ Danger Zone")
+        
+        with st.expander("🗑️ Delete All User Data", expanded=False):
+            st.error("**WARNING: This action cannot be undone!**")
+            st.write("This will permanently delete:")
+            st.write("- All your transaction data")
+            st.write("- All your categories and settings") 
+            st.write("- Your user account")
+            st.write("- You will be logged out immediately")
+            
+            st.markdown("**To confirm deletion, type your username below:**")
+            confirmation_username = st.text_input("Enter your username to confirm:", key="delete_confirmation")
+            
+            if confirmation_username == st.session_state.username:
+                if st.button("🗑️ DELETE ALL MY DATA", type="primary", help="This will permanently delete all your data"):
+                    with st.spinner("Deleting your data..."):
+                        success, message = delete_user_data(st.session_state.username)
+                        
+                    if success:
+                        st.success("✅ All your data has been successfully deleted.")
+                        st.info("You will be logged out in 3 seconds...")
+                        time.sleep(3)
+                        
+                        # Log out the user
+                        st.session_state.logged_in = False
+                        st.session_state.username = None
+                        st.session_state.is_guest = False
+                        st.session_state.categories = {"Uncategorized": []}
+                        
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Failed to delete data: {message}")
+            elif confirmation_username:
+                st.warning("⚠️ Username doesn't match. Please type your exact username to confirm deletion.")
+            
+            if not confirmation_username:
+                st.button("🗑️ DELETE ALL MY DATA", disabled=True, help="Enter your username to enable this button")
 
          
 main()

@@ -3,7 +3,7 @@
 A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits. Currently only works with Revolut.
 
 ## Features
-- 🔐 User authentication with password encryption
+- 🔐 User authentication with data encryption
 - 📊 Interactive spending analytics and visualizations
 - 🏷️ Automatic transaction categorization
 - 💾 Cloud data storage via private GitHub repository
@@ -13,30 +13,21 @@ A personal finance dashboard built with Streamlit that tracks spending, categori
 🚀 **Live App**: https://revolut-data-analysis.streamlit.app
 
 ## Deployment
-This app is deployed on Streamlit Cloud with data stored securely in a private GitHub repository.
+This app is deployed on Streamlit Cloud with encrypted data stored securely in a private GitHub repository.
 
-### PROD Status
+### ✅ PROD Status
 - ✅ login/registration for users
 - ✅ password encryption
 - ✅ changes committed to private GitHub repository
 - ✅ change password feature
 - ✅ user data encryption
-- 🚧 user data deletion option
-
+- ✅ user data deletion option
 
 # Questlog
 ### Known bugs
 - currency is HUF everwhere -> make it universal
 - convert welcome message in sidebar to a st.toast() instead (and maybe even the failed to upload x rows st.warning() too)
-
-### PROD
-- ✅ login/registration for users
-- ✅ password encyption
-- ✅ changes in the files should be commited to a private github repository when button is clicked
-    - ✅ everytime a change is made should there be a commit
-- log file
-- user data deletion option
-- user data encyption
+- use st.spinner where there are big load times
 
 ### Main page
 - ✅ Make editable dataframe functionable
