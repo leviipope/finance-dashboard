@@ -271,66 +271,16 @@ def get_spending_color(amount):
     
     return f"rgb({r}, {g}, {b})"
 
-def login_page():
-    st.markdown(
-        """
-        <div style="text-align: center; padding: 30px 0;">
-            <h1 style="color: #4CAF50; font-size: 3.5em; margin-bottom: 10px;">Revolut Analysis Dashboard</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    tab1, tab2, tab3 = st.tabs(["Login", "Register", "👤 Guest Mode"])
-    
-    with tab1:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Login to Your Account</h3>", unsafe_allow_html=True)
-        
-        _, col2, _ = st.columns([1, 2, 1])
-        with col2:
-            username = st.text_input("Username", placeholder="Enter your username", key="login_username")
-            password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
-            
-            if st.button("Login", use_container_width=True, type="primary"):
-                if authenticate_user(username, password):
-                    st.session_state.logged_in = True
-                    st.session_state.username = username
-                    st.session_state.is_guest = False
-                    load_user_data(username)
-                    st.success("Login successful! Redirecting...")
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password!")
-    
-    with tab2:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Create New Account</h3>", unsafe_allow_html=True)
-        
-        _, col2, _ = st.columns([1, 2, 1])
-        with col2:
-            new_username = st.text_input("Choose Username", placeholder="Enter new username", key="reg_username")
-            new_password = st.text_input("Choose Password", type="password", placeholder="Enter new password", key="reg_password")
-            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="reg_confirm")
-            
-            if st.button("Register", use_container_width=True, type="primary"):
-                if register_user(new_username, new_password, confirm_password):
-                    st.success("Registration successful! You can now login.")
-                    st.rerun()
-    
-    with tab3:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Try as Guest</h3>", unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.info("🎯 **Guest Mode Features:**\n- Upload and analyze your CSV file\n- All dashboard analytics available\n- Data is temporary (not saved)")
-            st.warning("⚠️ **Note:** Your data will be lost when you close the browser!")
-            
-            if st.button("👤 Continue as Guest", use_container_width=True, type="secondary"):
-                st.session_state.logged_in = True
-                st.session_state.username = "guest"
-                st.session_state.is_guest = True
-                st.session_state.categories = {"Uncategorized": []}
-                st.success("Welcome, Guest! Please upload a CSV file to get started.")
-                st.rerun()
+def hash_password(password):
+    salt = secrets.token_hex(16)
+    password_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return salt + password_hash.hex()
+
+def verify_password(stored_password, provided_password):
+    salt = stored_password[:32]
+    stored_hash = stored_password[32:]
+    password_hash = hashlib.pbkdf2_hmac('sha256', provided_password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return stored_hash == password_hash.hex()
 
 def authenticate_user(username, password):
     if not username or not password:
@@ -394,20 +344,164 @@ def register_user(username, password, confirm_password):
         st.error("Failed to register user. Please try again.")
         return False
 
-def hash_password(password):
-    salt = secrets.token_hex(16)
-    password_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
-    return salt + password_hash.hex()
+def change_password(username, old_password, new_password, confirm_password):
+    if not username or not old_password or not new_password:
+        st.error("Please fill in all fields!")
+        return False
+    
+    if new_password != confirm_password:
+        st.error("New passwords don't match!")
+        return False
+    
+    users_content = read_github_file("data/users.json")
+    
+    if not users_content:
+        st.error("User database not found!")
+        return False
+    
+    try:
+        users = json.loads(users_content)
+    except:
+        st.error("Error reading user database!")
+        return False
+    
+    if username not in users:
+        st.error("User not found!")
+        return False
+    
+    # Verify old password
+    stored_password = users[username]["password"]
+    if not verify_password(stored_password, old_password):
+        st.error("Current password is incorrect!")
+        return False
+    
+    # Update password
+    hashed_password = hash_password(new_password)
+    users[username]["password"] = hashed_password
+    users[username]["password_changed_at"] = datetime.now().isoformat()
+    
+    users_content = json.dumps(users, indent=2)
+    commit_message = f"Password changed for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    success = write_github_file("data/users.json", users_content, commit_message)
+    
+    if success:
+        st.success("🔐 Password changed successfully!")
+        time.sleep(2)
+        return True
+    else:
+        st.error("Failed to change password. Please try again.")
+        return False
 
-def verify_password(stored_password, provided_password):
-    salt = stored_password[:32]
-    stored_hash = stored_password[32:]
-    password_hash = hashlib.pbkdf2_hmac('sha256', provided_password.encode('utf-8'), salt.encode('utf-8'), 100000)
-    return stored_hash == password_hash.hex()
+def change_password_page():
+    st.markdown(
+        """
+        <div style="text-align: center; padding: 30px 0;">
+            <h1 style="color: #4CAF50; font-size: 3.5em; margin-bottom: 10px;">Change Password</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    _, col2, _ = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Update Your Password</h3>", unsafe_allow_html=True)
+        
+        username = st.text_input("Username", placeholder="Enter your username", key="change_username")
+        current_password = st.text_input("Current Password", type="password", placeholder="Enter current password", key="current_password")
+        new_password = st.text_input("New Password", type="password", placeholder="Enter new password", key="new_password")
+        confirm_new_password = st.text_input("Confirm New Password", type="password", placeholder="Confirm new password", key="confirm_new_password")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Change Password", use_container_width=True, type="primary"):
+                if change_password(username, current_password, new_password, confirm_new_password):
+                    st.success("Password changed successfully! Redirecting to login...")
+                    time.sleep(2)
+                    st.session_state.show_change_password = False
+                    st.rerun()
+        
+        with col2:
+            if st.button("Back to Login", use_container_width=True, type="secondary"):
+                st.session_state.show_change_password = False
+                st.rerun()
+
+def login_page():
+    st.markdown(
+        """
+        <div style="text-align: center; padding: 30px 0;">
+            <h1 style="color: #4CAF50; font-size: 3.5em; margin-bottom: 10px;">Revolut Analysis Dashboard</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    tab1, tab2, tab3 = st.tabs(["Login", "Register", "👤 Guest Mode"])
+    
+    with tab1:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Login to Your Account</h3>", unsafe_allow_html=True)
+        
+        _, col2, _ = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("Username", placeholder="Enter your username", key="login_username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
+            
+            if st.button("Login", use_container_width=True, type="primary"):
+                if authenticate_user(username, password):
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.is_guest = False
+                    load_user_data(username)
+                    st.success("Login successful! Redirecting...")
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password!")
+            
+            # Change Password Button
+            st.markdown("---")
+            if st.button("🔐 Change Password", use_container_width=True, type="secondary"):
+                st.session_state.show_change_password = True
+                st.rerun()
+    
+    with tab2:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Create New Account</h3>", unsafe_allow_html=True)
+        
+        _, col2, _ = st.columns([1, 2, 1])
+        with col2:
+            new_username = st.text_input("Choose Username", placeholder="Enter new username", key="reg_username")
+            new_password = st.text_input("Choose Password", type="password", placeholder="Enter new password", key="reg_password")
+            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="reg_confirm")
+            
+            if st.button("Register", use_container_width=True, type="primary"):
+                if register_user(new_username, new_password, confirm_password):
+                    st.success("Registration successful! You can now login.")
+                    st.rerun()
+    
+    with tab3:
+        st.markdown("<h3 style='text-align: center; margin-bottom: 30px;'>Try as Guest</h3>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.info("🎯 **Guest Mode Features:**\n- Upload and analyze your CSV file\n- All dashboard analytics available\n- Data is temporary (not saved)")
+            st.warning("⚠️ **Note:** Your data will be lost when you close the browser!")
+            
+            if st.button("👤 Continue as Guest", use_container_width=True, type="secondary"):
+                st.session_state.logged_in = True
+                st.session_state.username = "guest"
+                st.session_state.is_guest = True
+                st.session_state.categories = {"Uncategorized": []}
+                st.success("Welcome, Guest! Please upload a CSV file to get started.")
+                st.rerun()
 
 def main():
+    # Initialize session state for change password page
+    if "show_change_password" not in st.session_state:
+        st.session_state.show_change_password = False
+    
     if not st.session_state.logged_in:
-        login_page()
+        if st.session_state.show_change_password:
+            change_password_page()
+        else:
+            login_page()
         return
     
     if not github_repo and not st.session_state.is_guest:

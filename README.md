@@ -19,7 +19,7 @@ This app is deployed on Streamlit Cloud with data stored securely in a private G
 - ✅ login/registration for users
 - ✅ password encryption
 - ✅ changes committed to private GitHub repository
-- 🚧 log file
+- ✅change password feature
 - 🚧 user data deletion option
 - 🚧 user data encryption
 
