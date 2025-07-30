@@ -14,6 +14,125 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+# Currency configuration and formatting
+CURRENCY_SYMBOLS = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'JPY': '¥',
+    'CNY': '¥',
+    'CAD': 'C$',
+    'AUD': 'A$',
+    'CHF': 'CHF',
+    'HUF': 'Ft',
+    'PLN': 'zł',
+    'CZK': 'Kč',
+    'SEK': 'kr',
+    'NOK': 'kr',
+    'DKK': 'kr',
+    'RON': 'lei',
+    'BGN': 'лв',
+    'HRK': 'kn',
+    'RUB': '₽',
+    'TRY': '₺',
+    'INR': '₹',
+    'KRW': '₩',
+    'SGD': 'S$',
+    'HKD': 'HK$',
+    'MXN': 'MX$',
+    'BRL': 'R$',
+    'ZAR': 'R',
+    'NZD': 'NZ$',
+    'THB': '฿',
+    'MYR': 'RM',
+    'IDR': 'Rp',
+    'PHP': '₱',
+    'VND': '₫'
+}
+
+# Currency decimal places (some currencies don't use decimals)
+CURRENCY_DECIMALS = {
+    'JPY': 0,  # Japanese Yen doesn't use decimals
+    'KRW': 0,  # Korean Won doesn't use decimals
+    'VND': 0,  # Vietnamese Dong doesn't use decimals
+    'IDR': 0,  # Indonesian Rupiah doesn't use decimals
+    'HUF': 0,  # Hungarian Forint doesn't use decimals
+    'CLP': 0,  # Chilean Peso doesn't use decimals
+    'ISK': 0,  # Icelandic Krona doesn't use decimals
+}
+
+def detect_currency_from_df(df):
+    """Detect currency from the DataFrame"""
+    if 'Currency' in df.columns:
+        # Get the most common currency in the dataset
+        currency = df['Currency'].mode().iloc[0] if not df['Currency'].mode().empty else 'HUF'
+        return currency.upper()
+    
+    # If no Currency column, try to infer from other sources or use default
+    # You could add logic here to detect currency from Description or other columns
+    return 'HUF'  # Default fallback
+
+def format_currency(amount, currency='HUF', show_symbol=True, compact=False):
+    """Format amount with appropriate currency symbol and formatting"""
+    currency = currency.upper()
+    symbol = CURRENCY_SYMBOLS.get(currency, currency)
+    decimals = CURRENCY_DECIMALS.get(currency, 2)
+    
+    # Handle compact formatting (e.g., 1.5k instead of 1,500)
+    if compact and abs(amount) >= 1000:
+        if abs(amount) >= 1_000_000:
+            compact_amount = amount / 1_000_000
+            suffix = 'M'
+        else:
+            compact_amount = amount / 1000
+            suffix = 'k'
+        
+        if decimals == 0:
+            formatted_amount = f"{compact_amount:.0f}{suffix}"
+        else:
+            formatted_amount = f"{compact_amount:.1f}{suffix}"
+    else:
+        if decimals == 0:
+            formatted_amount = f"{amount:,.0f}"
+        else:
+            formatted_amount = f"{amount:,.{decimals}f}"
+    
+    if show_symbol:
+        # For currencies with symbols that typically go after the amount
+        if currency in ['HUF', 'PLN', 'CZK', 'SEK', 'NOK', 'DKK', 'RON']:
+            return f"{formatted_amount} {symbol}"
+        else:
+            return f"{symbol}{formatted_amount}"
+    else:
+        return formatted_amount
+
+def get_user_currency(username):
+    """Get the currency for a specific user from their data"""
+    if st.session_state.is_guest:
+        return st.session_state.get('currency', 'HUF')
+    
+    # Try to get from session state first (cached)
+    if f"{username}_currency" in st.session_state:
+        return st.session_state[f"{username}_currency"]
+    
+    # Try to load from stored data
+    files = get_user_files(username)
+    currency_file = files["dataframe"]
+    
+    df_content = read_encrypted_github_file(currency_file, username)
+    if df_content:
+        try:
+            from io import StringIO
+            df = pd.read_csv(StringIO(df_content))
+            if 'Currency' in df.columns:
+                currency = detect_currency_from_df(df)
+                st.session_state[f"{username}_currency"] = currency
+                return currency
+        except Exception:
+            pass
+    
+    return 'HUF'  # Default fallback
+
 st.set_page_config(page_title="Financial Dashboard", page_icon=":money_with_wings:", layout="wide") 
 
 GITHUB_TOKEN = st.secrets.get("github", {}).get("token")
@@ -268,18 +387,43 @@ if st.session_state.logged_in and st.session_state.username:
 def load_statement(file):
     try: 
         df = pd.read_csv(file)
-        df = df.drop(["Fee", "Completed Date", "Currency", "State"], axis=1)
+        
+        # Detect currency before dropping the Currency column
+        detected_currency = detect_currency_from_df(df)
+        
+        # Store the detected currency for the current user in session state
+        if st.session_state.get("username"):
+            if st.session_state.is_guest:
+                st.session_state['currency'] = detected_currency
+            else:
+                st.session_state[f"{st.session_state.username}_currency"] = detected_currency
+        
+        # Drop columns that exist in the dataframe
+        columns_to_drop = []
+        for col in ["Fee", "Completed Date", "Currency", "State"]:
+            if col in df.columns:
+                columns_to_drop.append(col)
+        
+        if columns_to_drop:
+            df = df.drop(columns_to_drop, axis=1)
+            
         df = df[df["Type"] != "INTEREST"]
         df['Started Date'] = pd.to_datetime(df['Started Date'])
         df = df.rename(columns={"Started Date": "Date"})
 
         df["Hide"] = False 
-        df.loc[df['Description'].str.startswith('To HUF'), 'Hide'] = True
+        # Update currency-specific hiding rules to be more generic
+        df.loc[df['Description'].str.contains(f'To {detected_currency}', case=False, na=False), 'Hide'] = True
         df.loc[df['Description'] == 'Transfer from Revolut user', 'Hide'] = True
         df.loc[(df['Product'] == 'Current') & (df['Description'] == 'From Savings Account'), 'Hide'] = True
         df.loc[(df['Product'] == 'Current') & (df['Description'] == 'To Savings Account'), 'Hide'] = True
 
-        df['Amount'] = df['Amount'].round().astype(int)
+        # Round amounts based on currency decimal rules
+        decimals = CURRENCY_DECIMALS.get(detected_currency, 2)
+        if decimals == 0:
+            df['Amount'] = df['Amount'].round().astype(int)
+        else:
+            df['Amount'] = df['Amount'].round(decimals)
 
         try:
             df['Balance'] = pd.to_numeric(df['Balance'], errors='coerce').round().astype('Int64')
@@ -290,7 +434,8 @@ def load_statement(file):
                 for index, row in dropped_rows.iterrows():
                     st.warning(f"{row['Description']} {row['Amount']}")
 
-            
+
+                
             df = df.dropna(subset=['Balance'])
         except Exception as e:
             st.error(f"Error processing Balance column: {str(e)}")
@@ -584,6 +729,7 @@ def login_page():
                     st.session_state.logged_in = True
                     st.session_state.username = username
                     st.session_state.is_guest = False
+                    st.session_state.show_welcome_toast = True
                     load_user_data(username)
                     st.success("Login successful! Redirecting...")
                     st.rerun()
@@ -710,12 +856,16 @@ def main():
     if not github_repo and not st.session_state.is_guest:
         st.error("⚠️ GitHub storage not configured. Running in offline mode.")
         st.info("💡 Configure GitHub secrets to enable data persistence.")
-    
+
+    # Show welcome toast once after login
+    if st.session_state.get("show_welcome_toast", False):
+        st.toast(f"👋 Welcome, **{st.session_state.username}**!")
+        st.session_state.show_welcome_toast = False
+
     with st.sidebar:
         if st.session_state.is_guest:
             st.info("👤 **Guest Mode**\nData is temporary")
         else:
-            st.success(f"👋 Welcome, **{st.session_state.username}**!")
             if st.session_state.username == "admin":
                 st.info("🛡️ **Admin User**")
         
@@ -890,6 +1040,9 @@ def main():
         main_df = load_main_spending_dataframe()
 
         if main_df is not None:
+            # Get user's currency
+            user_currency = get_user_currency(st.session_state.username)
+            
             spending_df = main_df[main_df['Amount'] < 0].copy()
 
             col1, _, col2 = st.columns([4, 1, 9])
@@ -914,6 +1067,7 @@ def main():
             with col2:    
                 total_spending = filtered_spending_df['Amount'].sum()
                 spending_color = get_spending_color(total_spending)
+                formatted_total = format_currency(abs(total_spending), user_currency)
                 
                 st.markdown(
                     f"""
@@ -928,7 +1082,7 @@ def main():
                         width: auto;
                     ">
                         <div style="font-size: 32px; color: white;">
-                            Total spent in the selected period: <span style="color: {spending_color};">{abs(total_spending):,.0f} Ft</span>
+                            Total spent in the selected period: <span style="color: {spending_color};">{formatted_total}</span>
                         </div>
                     </div>
                     """,
@@ -946,21 +1100,24 @@ def main():
             monthly_spending['Amount'] = monthly_spending['Amount'].abs()
             monthly_spending = monthly_spending.sort_values(by='Date', ascending=False)
             monthly_spending['Amount_Label'] = monthly_spending['Amount'].apply(
-                lambda x: f'{x/1000:.0f}k Ft' if x >= 1000 else f'{x:.0f} Ft'
+                lambda x: format_currency(x, user_currency, compact=True)
             )
             for i in range(3):
                 if i < len(monthly_spending):
                     month_data = monthly_spending.iloc[i]
+                    delta_amount = int(monthly_spending.iloc[i]['Amount'] - (monthly_spending.iloc[i+1]['Amount'] if i+1 < len(monthly_spending) else 0))
+                    delta_formatted = format_currency(delta_amount, user_currency)
                     with col1 if i == 0 else col2 if i == 1 else col3:
                         st.metric(
                             label=month_data['Date'].strftime('%B %Y'),
                             value=month_data['Amount_Label'],
-                            delta = f"{int(monthly_spending.iloc[i]['Amount'] - (monthly_spending.iloc[i+1]['Amount'] if i+1 < len(monthly_spending) else 0))} Ft",
+                            delta=delta_formatted,
                             delta_color = "inverse"
                         )
                 else:
+                    zero_formatted = format_currency(0, user_currency)
                     with col1 if i == 0 else col2 if i == 1 else col3:
-                        st.metric(label="No data", value="0 Ft", delta="0 Ft")
+                        st.metric(label="No data", value=zero_formatted, delta=zero_formatted)
 
             if st.checkbox("Show spending for specific month(s)"):
                 col1, col2, _ = st.columns([1, 1, 3])
@@ -999,9 +1156,10 @@ def main():
                             result_idx = row * 3 + col_idx
                             if result_idx < num_results:
                                 with cols[col_idx]:
+                                    formatted_spending = format_currency(selected_spending[result_idx], user_currency)
                                     st.metric(
                                         label=selected_labels[result_idx],
-                                        value=f"{selected_spending[result_idx]:,.0f} Ft"
+                                        value=formatted_spending
                                     )
 
             # Balance over time line chart
@@ -1029,7 +1187,7 @@ def main():
             else:
                 st.write("No 'Current' account balance data to display for the selected period.")
             
-            col1, _ = st.columns([1, 5])
+            col1, _ = st.columns([1, 4])
             with col1:
                 spending_ot_selector = st.selectbox(
                     "Spending Over Time",
@@ -1148,7 +1306,7 @@ def main():
                             font=dict(color='white')
                         )
                         fig_heatmap_daily.update_traces(
-                            hovertemplate='Day: %{x}<br>Week: %{y}<br>Amount: %{z:.0f} Ft<extra></extra>'
+                            hovertemplate=f'Day: %{{x}}<br>Week: %{{y}}<br>Amount: %{{z:.0f}} {CURRENCY_SYMBOLS.get(user_currency, user_currency)}<extra></extra>'
                         )
 
                         with cols[col_positions[i]]:
@@ -1162,15 +1320,16 @@ def main():
                 weekly_spending = weekly_spending.groupby('Week')['Amount'].sum().reset_index()
                 weekly_spending = weekly_spending.sort_values(by='Week')
                 weekly_spending['Amount_Label'] = weekly_spending['Amount'].apply(
-                    lambda x: f'{x/1000:.0f}k' if x >= 1000 else f'{x:.0f}'
+                    lambda x: format_currency(x, user_currency, compact=True, show_symbol=False)
                 )
+                currency_label = f'Weekly Spending ({CURRENCY_SYMBOLS.get(user_currency, user_currency)})'
                 fig_weekly_spending = px.bar(
                     weekly_spending,
                     x='Week',
                     y='Amount',
                     title='Weekly Spending',
                     text='Amount_Label',
-                    labels={'Week': 'Week', 'Amount': 'Weekly Spending (Ft)'},
+                    labels={'Week': 'Week', 'Amount': currency_label},
                 )
                 fig_weekly_spending.update_traces(
                     textposition='inside',
@@ -1238,6 +1397,9 @@ def main():
             st.error("No data available for income analytics.")
             return
 
+        # Get user's currency
+        user_currency = get_user_currency(st.session_state.username)
+
         income_df = main_df[main_df['Amount'] > 0].copy()
         income_df = income_df[income_df['Hide'] == False]
         income_df = income_df[income_df['Product'] == 'Current']
@@ -1269,16 +1431,22 @@ def main():
                 current_income = monthly_incomes[i]
                 previous_income = monthly_incomes[i + 1] if i + 1 < len(monthly_incomes) else 0
                 
+                income_formatted = format_currency(current_income, user_currency)
+                income_delta = format_currency(current_income - previous_income, user_currency)
+                
                 st.metric(
                     label=f"{month_name} Income",
-                    value=f"{current_income:,.0f} Ft",
-                    delta=f"{current_income - previous_income:,.0f} Ft"
+                    value=income_formatted,
+                    delta=income_delta
                 )
 
+                savings_formatted = format_currency(monthly_savings[i], user_currency)
+                savings_delta = format_currency(monthly_savings[i] - (monthly_savings[i + 1] if i + 1 < len(monthly_savings) else 0), user_currency)
+                
                 st.metric(
                     label=f"{month_name} Savings",
-                    value=f"{monthly_savings[i]:,.0f} Ft",
-                    delta=f"{monthly_savings[i] - (monthly_savings[i + 1] if i + 1 < len(monthly_savings) else 0):,.0f} Ft"
+                    value=savings_formatted,
+                    delta=savings_delta
                 )
 
                 st.metric(
@@ -1346,6 +1514,16 @@ def main():
         if st.session_state.is_guest:
             st.info("👤 **Guest Mode**")
             st.write("Guest users don't have persistent data to manage. Your data is temporary and will be cleared when you close the browser.")
+            
+            # Show detected currency for guest users
+            if 'guest_dataframe' in st.session_state:
+                st.markdown("---")
+                st.markdown("#### Currency Settings (Guest Mode)")
+                
+                current_currency = get_user_currency(st.session_state.username)
+                st.info(f"**Detected Currency:** {current_currency} ({CURRENCY_SYMBOLS.get(current_currency, current_currency)})")
+                st.write("Currency was automatically detected from your uploaded bank statement.")
+            
             return
         
         st.markdown("### Account Management")
@@ -1441,5 +1619,15 @@ def main():
             if not confirmation_username:
                 st.button("🗑️ DELETE ALL MY DATA", disabled=True, help="Enter your username to enable this button")
 
+        st.markdown("---")
+        
+        # Currency Information Section
+        st.markdown("#### Currency Information")
+        
+        current_currency = get_user_currency(st.session_state.username)
+        st.info(f"**Detected Currency:** {current_currency} ({CURRENCY_SYMBOLS.get(current_currency, current_currency)})")
+        st.write("💡 Currency is automatically detected from your uploaded bank statement and used throughout the dashboard.")
+
+        st.markdown("---")
          
 main()

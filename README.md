@@ -1,6 +1,6 @@
 # Finance Dashboard
 
-A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits. Currently only works with Revolut.
+A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits. Supports bank statements from Revolut.
 
 ## Features
 - 🔐 User authentication with data encryption
@@ -8,6 +8,7 @@ A personal finance dashboard built with Streamlit that tracks spending, categori
 - 🏷️ Automatic transaction categorization
 - 💾 Cloud data storage via private GitHub repository
 - 📱 Mobile-friendly responsive design
+- 👤 Guest mode for trying the app without registration
 
 ## Demo
 🚀 **Live App**: https://revolut-data-analysis.streamlit.app
@@ -23,9 +24,13 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ user data encryption
 - ✅ user data deletion option
 
-# Questlog
 ### Known bugs
-- currency is HUF everwhere -> make it universal
+- 
+
+# Questlog
+
+- demo mode: so user doesnt have to upload a file
+- ✅ currency is HUF everwhere -> make it universal (FIXED: Now supports 32+ currencies!)
 - convert welcome message in sidebar to a st.toast() instead (and maybe even the failed to upload x rows st.warning() too)
 - use st.spinner where there are big load times
 
