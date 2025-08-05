@@ -1,5 +1,6 @@
-pandas
-streamlit
-matplotlib
-plotly
-PyGithub
+pandas>=1.5.0
+streamlit>=1.28.0
+matplotlib>=3.5.0
+plotly>=5.15.0
+PyGithub>=1.59.0
+cryptography>=40.0.0
