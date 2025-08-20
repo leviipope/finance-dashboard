@@ -136,8 +136,12 @@ def customize_data_page():
 
         with col1:
             upload_file = st.file_uploader("Upload your new Revolut statement", type=["csv"])
+            
+            from ..utils.currency import get_user_currency
+
             if upload_file is not None:
-                new_df = load_statement(upload_file)
+                user_currency = get_user_currency(st.session_state.username)
+                new_df = load_statement(upload_file, user_currency)
                 if new_df is not None:
                     if main_df is not None:
                         updated_df, num_new_rows = merge_dataframes(main_df, new_df)

@@ -32,12 +32,14 @@ def get_user_files(username):
     if username == "admin":
         return {
             "dataframe": "data/dataframes/main_dataframe.csv",
-            "categories": "data/categories/categories.json"
+            "categories": "data/categories/categories.json",
+            "currency": "data/currency/main_currency.json"
         }
     else:
         return {
             "dataframe": f"data/dataframes/{username}_dataframe.csv",
-            "categories": f"data/categories/{username}_categories.json"
+            "categories": f"data/categories/{username}_categories.json",
+            "currency": f"data/currency/{username}_currency.json"
         }
 
 
@@ -81,50 +83,42 @@ def read_github_file(file_path):
     
     try:
         file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+        if isinstance(file_content, list):
+            # If it's a directory, we can't read it as a file.
+            # This can happen if the path is wrong.
+            st.error(f"Path {file_path} is a directory, not a file.")
+            return None
         content = base64.b64decode(file_content.content).decode('utf-8')
         return content
-    except:
+    except Exception:
         return None
 
 
 def read_encrypted_github_file(file_path, username):
     """Read and decrypt a GitHub file for a specific user"""
-    if not github_repo:
+    content = read_github_file(file_path)
+    if content is None:
         return None
+
+    # If admin, return content as-is (not encrypted)
+    if username == "admin":
+        return content
     
-    # Only process files for the currently logged-in user or admin
-    if not st.session_state.get("username") or (
-        st.session_state.username != username and 
-        st.session_state.username != "admin" and 
-        username != "admin"
-    ):
-        return None
+    # Check if the content is already encrypted
+    if not is_encrypted_data(content):
+        # Content is not encrypted (probably default content like "{}")
+        return content
     
-    try:
-        file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
-        content = base64.b64decode(file_content.content).decode('utf-8')
-        
-        # If admin, return content as-is (not encrypted)
-        if username == "admin":
-            return content
-        
-        # Check if the content is already encrypted
-        if not is_encrypted_data(content):
-            # Content is not encrypted (probably default content like "{}")
-            return content
-        
-        # For regular users, decrypt the content
-        encryption_key = get_user_encryption_key(username)
-        if encryption_key:
-            decrypted_data = decrypt_data(content, encryption_key)
-            if decrypted_data is not None:
-                return decrypted_data
-            else:
-                # Decryption failed, might be unencrypted legacy data
-                return content
+    # For regular users, decrypt the content
+    encryption_key = get_user_encryption_key(username)
+    if encryption_key:
+        decrypted_data = decrypt_data(content, encryption_key)
+        if decrypted_data is not None:
+            return decrypted_data
         else:
-            return None
-    except Exception:
+            # Decryption failed, might be unencrypted legacy data
+            return content
+    else:
         return None
 
 
@@ -136,6 +130,9 @@ def write_github_file(file_path, content, commit_message):
     try:
         try:
             file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+            if isinstance(file_content, list):
+                st.error(f"Path {file_path} is a directory, cannot update.")
+                return False
             github_repo.update_file(
                 file_path,
                 commit_message,
@@ -143,7 +140,7 @@ def write_github_file(file_path, content, commit_message):
                 file_content.sha,
                 branch=GITHUB_BRANCH
             )
-        except:
+        except Exception:
             github_repo.create_file(
                 file_path,
                 commit_message,
@@ -192,32 +189,21 @@ def delete_user_data(username):
         files = get_user_files(username)
         errors = []
         
-        # Delete user's dataframe file
-        try:
-            file_content = github_repo.get_contents(files["dataframe"], ref=GITHUB_BRANCH)
-            github_repo.delete_file(
-                files["dataframe"],
-                f"Delete dataframe for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                file_content.sha,
-                branch=GITHUB_BRANCH
-            )
-        except Exception as e:
-            if "Not Found" not in str(e):
-                errors.append(f"Failed to delete dataframe: {str(e)}")
-        
-        # Delete user's categories file
-        try:
-            file_content = github_repo.get_contents(files["categories"], ref=GITHUB_BRANCH)
-            github_repo.delete_file(
-                files["categories"],
-                f"Delete categories for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                file_content.sha,
-                branch=GITHUB_BRANCH
-            )
-        except Exception as e:
-            if "Not Found" not in str(e):
-                errors.append(f"Failed to delete categories: {str(e)}")
-        
+        for file_type, file_path in files.items():
+            try:
+                file_content = github_repo.get_contents(file_path, ref=GITHUB_BRANCH)
+                if isinstance(file_content, list):
+                    continue # Should not happen with file paths
+                github_repo.delete_file(
+                    file_path,
+                    f"Delete {file_type} for user: {username} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    file_content.sha,
+                    branch=GITHUB_BRANCH
+                )
+            except Exception as e:
+                if "Not Found" not in str(e):
+                    errors.append(f"Failed to delete {file_type}: {str(e)}")
+
         # Remove user from users.json
         users_content = read_github_file("data/users.json")
         if users_content:

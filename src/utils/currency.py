@@ -3,6 +3,7 @@
 import pandas as pd
 import streamlit as st
 import re
+import json
 
 # Currency configuration and formatting
 CURRENCY_SYMBOLS = {
@@ -52,35 +53,9 @@ CURRENCY_DECIMALS = {
 }
 
 
-def detect_currency_from_df(df):
-    """Detect currency from the DataFrame"""
-    if 'Currency' in df.columns and not df['Currency'].empty:
-        # Standardize currency values (uppercase and strip whitespace)
-        currencies = df['Currency'].str.strip().str.upper()
-        # Get the most common non-null currency in the dataset
-        if not currencies.dropna().empty:
-            return currencies.dropna().mode().iloc[0]
-    
-    # If no Currency column or couldn't detect, try to infer from other columns
-    for col in df.columns:
-        # Check for currency in column names
-        if 'currency' in col.lower():
-            values = df[col].astype(str).str.strip().str.upper()
-            for curr in CURRENCY_SYMBOLS.keys():
-                if values.str.contains(curr).any():
-                    return curr
-    
-    # Check for currency symbols in monetary columns
-    amount_cols = [c for c in df.columns if any(x in c.lower() for x in ['amount', 'price', 'value', 'cost', 'total'])]
-    for col in amount_cols:
-        values = df[col].astype(str)
-        for curr, symbol in CURRENCY_SYMBOLS.items():
-            if values.str.contains(re.escape(symbol), regex=True).any():
-                return curr
-    
-    # Default fallback
-    return 'HUF'
-
+import json
+import streamlit as st
+from ..data.github_storage import read_github_file, get_user_files, write_encrypted_github_file, read_encrypted_github_file
 
 def format_currency(amount, currency='HUF', show_symbol=True, compact=False):
     """Format amount with appropriate currency symbol and formatting"""
@@ -117,11 +92,11 @@ def format_currency(amount, currency='HUF', show_symbol=True, compact=False):
         return formatted_amount
 
 
+from ..data.github_storage import read_encrypted_github_file, write_encrypted_github_file, get_user_files
+
+
 def get_user_currency(username):
     """Get the currency for a specific user from their data"""
-    from ..data.github_storage import read_encrypted_github_file, get_user_files
-    from io import StringIO
-    
     if st.session_state.is_guest:
         return st.session_state.get('currency', 'HUF')
     
@@ -131,16 +106,39 @@ def get_user_currency(username):
     
     # Try to load from stored data
     files = get_user_files(username)
-    currency_file = files["dataframe"]
+    currency_file = files.get("currency") # Use .get for safety
     
-    df_content = read_encrypted_github_file(currency_file, username)
-    if df_content:
-        try:
-            df = pd.read_csv(StringIO(df_content))
-            currency = detect_currency_from_df(df)
-            st.session_state[f"{username}_currency"] = currency
-            return currency
-        except Exception as e:
-            st.error(f"Error detecting currency: {e}")
+    if currency_file:
+        currency_content = read_encrypted_github_file(currency_file, username)
+        if currency_content:
+            try:
+                currency_data = json.loads(currency_content)
+                currency = currency_data.get("currency")
+                if currency:
+                    st.session_state[f"{username}_currency"] = currency
+                    return currency
+            except (json.JSONDecodeError, KeyError):
+                pass  # Fallback to None if file is empty or malformed
     
-    return 'HUF'  # Default fallback
+    return None  # Default fallback if no currency is set
+
+
+def save_user_currency(username, currency):
+    """Save the user's selected currency."""
+    if st.session_state.is_guest:
+        st.session_state['currency'] = currency
+        return
+
+    files = get_user_files(username)
+    currency_file = files.get("currency")
+    if not currency_file:
+        # This should ideally not happen if files are ensured at login
+        st.error("Currency file not found for user.")
+        return
+
+    currency_data = {"currency": currency}
+    content = json.dumps(currency_data, indent=2)
+    commit_message = f"Set currency for user {username}"
+    
+    write_encrypted_github_file(currency_file, content, commit_message, username)
+    st.session_state[f"{username}_currency"] = currency

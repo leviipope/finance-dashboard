@@ -5,7 +5,7 @@ import streamlit as st
 import json
 from datetime import datetime
 from io import StringIO
-from ..utils.currency import detect_currency_from_df, CURRENCY_DECIMALS
+from ..utils.currency import CURRENCY_DECIMALS
 from ..data.github_storage import (
     read_encrypted_github_file, 
     write_encrypted_github_file, 
@@ -33,15 +33,15 @@ def load_user_data(username):
         st.session_state.categories = {"Uncategorized": []}
 
 
-def load_statement(file):
+def load_statement(file, currency):
     """Load and process a CSV statement file"""
     try: 
         df = pd.read_csv(file)
         
-        # Detect currency before dropping the Currency column
-        detected_currency = detect_currency_from_df(df)
+        # Use the user-selected currency
+        detected_currency = currency
         
-        # Store the detected currency for the current user in session state
+        # Store the currency for the current user in session state
         if st.session_state.get("username"):
             if st.session_state.is_guest:
                 st.session_state['currency'] = detected_currency

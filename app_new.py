@@ -9,7 +9,8 @@ import streamlit as st
 from src.pages.auth_pages import login_page, change_password_page
 from src.pages.customize_data import customize_data_page
 from src.data.github_storage import github_repo
-from src.data.processing import load_statement
+from src.data.processing import load_statement, load_main_dataframe
+from src.utils.currency import get_user_currency, save_user_currency, CURRENCY_SYMBOLS
 
 # Set page configuration
 st.set_page_config(
@@ -42,7 +43,9 @@ def guest_file_upload():
     uploaded_file = st.file_uploader("Upload your Revolut statement to get started", type=["csv"])
     
     if uploaded_file is not None:
-        guest_df = load_statement(uploaded_file)
+        # For guests, we don't have a pre-selected currency.
+        # We can either ask for it, or use a default. Let's use a default for simplicity.
+        guest_df = load_statement(uploaded_file, 'HUF') # Assuming HUF for guests
         if guest_df is not None:
             st.session_state.guest_dataframe = guest_df
             st.success("File uploaded successfully! You can now use all analytics features.")
@@ -53,6 +56,38 @@ def guest_file_upload():
     else:
         st.info("Please upload a CSV file to continue with guest mode.")
         return False
+
+
+def initial_setup_page():
+    """Page for initial currency selection and data upload."""
+    st.title("Welcome! Let's set up your account.")
+    
+    st.info("Please select your primary currency. This will be used for all your financial data.")
+    
+    selected_currency = st.selectbox(
+        "Select Currency", 
+        list(CURRENCY_SYMBOLS.keys()),
+        index=list(CURRENCY_SYMBOLS.keys()).index('HUF') # Default to HUF
+    )
+    
+    uploaded_file = st.file_uploader("Upload your first Revolut statement", type=["csv"])
+    
+    if st.button("Complete Setup"):
+        if uploaded_file and selected_currency:
+            # Save the selected currency
+            save_user_currency(st.session_state.username, selected_currency)
+            
+            # Load the initial dataframe
+            df = load_statement(uploaded_file, selected_currency)
+            if df is not None:
+                from src.data.processing import save_main_dataframe
+                save_main_dataframe(df)
+                st.success("Setup complete! Your data has been saved.")
+                st.rerun()
+            else:
+                st.error("Failed to process the uploaded file.")
+        else:
+            st.warning("Please select a currency and upload a file.")
 
 
 def main_sidebar():
@@ -85,6 +120,14 @@ def main_app():
         else:
             login_page()
         return
+
+    # Check if user has data. If not, show setup page.
+    if not st.session_state.is_guest:
+        user_currency = get_user_currency(st.session_state.username)
+        main_df = load_main_dataframe()
+        if not user_currency or main_df is None:
+            initial_setup_page()
+            return
     
     # Show GitHub storage warning for non-guest users
     if not github_repo and not st.session_state.is_guest:
@@ -101,8 +144,9 @@ def main_app():
     
     # Handle guest mode file upload
     if st.session_state.is_guest:
-        if not guest_file_upload():
-            return
+        if 'guest_dataframe' not in st.session_state:
+            if not guest_file_upload():
+                return
     
     # Main navigation
     page = st.sidebar.radio(

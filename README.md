@@ -25,14 +25,12 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ user data deletion option
 
 ### Known bugs
-- currency detection isnt working (defaulting to HUF)
 - when pressing enter on login page, nothing happens
 
 # Questlog
 - demo mode: so user doesnt have to upload a file
 - ✅ convert welcome message in sidebar to a st.toast() instead
     - (and maybe even the failed to upload x rows st.warning() too)
-- monthly income trend
 - use st.spinner where there are big load times
 
 ### Main page

@@ -143,8 +143,7 @@ def user_settings_page():
     st.markdown("#### Currency Information")
     
     current_currency = get_user_currency(st.session_state.username)
-    st.info(f"**Detected Currency:** {current_currency}")
-    st.write("💡 Currency is automatically detected from your uploaded bank statement and used throughout the dashboard.")
+    st.info(f"**Chosen Currency:** {current_currency}")
 
     st.markdown("---")
 
