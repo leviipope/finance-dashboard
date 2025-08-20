@@ -25,12 +25,10 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ user data deletion option
 
 ### Known bugs
-- after changing the password, the program cant decrypt the data
 - currency detection isnt working (defaulting to HUF)
 - when pressing enter on login page, nothing happens
 
 # Questlog
-
 - demo mode: so user doesnt have to upload a file
 - ✅ convert welcome message in sidebar to a st.toast() instead
     - (and maybe even the failed to upload x rows st.warning() too)

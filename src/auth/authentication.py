@@ -6,7 +6,13 @@ import time
 import json
 import streamlit as st
 from datetime import datetime
-from ..data.github_storage import read_github_file, write_github_file
+from ..data.github_storage import read_github_file, write_github_file, read_encrypted_github_file, write_encrypted_github_file
+from ..data.processing import get_user_files
+from ..utils.encryption import (
+    derive_key_from_password, 
+    encrypt_data, 
+    decrypt_data,
+)
 
 
 def hash_password(password):
@@ -91,7 +97,7 @@ def register_user(username, password, confirm_password):
 
 
 def change_password(username, old_password, new_password, confirm_password):
-    """Change user password"""
+    """Change user password and re-encrypt data"""
     if not username or not old_password or not new_password:
         st.error("Please fill in all fields!")
         return False
@@ -121,10 +127,62 @@ def change_password(username, old_password, new_password, confirm_password):
     if not verify_password(stored_password, old_password):
         st.error("Current password is incorrect!")
         return False
-    
-    # Update password
-    hashed_password = hash_password(new_password)
-    users[username]["password"] = hashed_password
+
+    # --- Re-encryption logic ---
+    st.info("🔑 Your password is used to encrypt your data. Re-encrypting data with new password...")
+
+    # 1. Get old and new encryption keys
+    old_key = derive_key_from_password(username, stored_password)
+    new_hashed_password = hash_password(new_password)
+    new_key = derive_key_from_password(username, new_hashed_password)
+
+    if not old_key or not new_key:
+        st.error("Could not generate encryption keys. Aborting password change.")
+        return False
+
+    # 2. Get user data files
+    files = get_user_files(username)
+    files_to_reencrypt = [files["dataframe"], files["categories"]]
+
+    # 3. Decrypt with old key, re-encrypt with new key
+    for file_path in files_to_reencrypt:
+        encrypted_content = read_github_file(file_path)
+        if encrypted_content:
+            try:
+                decrypted_content = decrypt_data(encrypted_content, old_key)
+                if decrypted_content is None:
+                    # This could happen if data was not encrypted, or decryption failed
+                    # We'll assume it failed and stop
+                    st.error(f"Failed to decrypt {file_path} with old password. Aborting password change.")
+                    return False
+
+                # Re-encrypt with the new key
+                reencrypted_content = encrypt_data(decrypted_content, new_key)
+                if reencrypted_content is None:
+                    st.error(f"Failed to re-encrypt {file_path} with new password. Aborting.")
+                    return False
+
+                # Write back to GitHub
+                commit_message = f"Re-encrypt data for {username} due to password change"
+                success = write_github_file(file_path, reencrypted_content, commit_message)
+                if not success:
+                    st.error(f"Failed to write re-encrypted data for {file_path}. Aborting.")
+                    return False
+            except Exception:
+                # This case handles data that was not encrypted in the first place.
+                # We will encrypt it with the new key.
+                try:
+                    reencrypted_content = encrypt_data(encrypted_content, new_key)
+                    write_github_file(file_path, reencrypted_content, f"Encrypting existing data for {username} during password change")
+                except Exception as e2:
+                     st.error(f"Could not encrypt existing unencrypted data: {e2}")
+                     return False
+
+    st.success("Data re-encryption successful.")
+    # --- Re-encryption logic ends ---
+
+    # Update password in users.json
+    users[username]["password"] = new_hashed_password
     users[username]["password_changed_at"] = datetime.now().isoformat()
     
     users_content = json.dumps(users, indent=2)
