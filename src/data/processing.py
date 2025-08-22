@@ -58,6 +58,7 @@ def load_statement(file, currency):
             df = df.drop(columns_to_drop, axis=1)
             
         df = df[df["Type"] != "INTEREST"]
+        df = df[df["Type"] != "Interest"]
         df['Started Date'] = pd.to_datetime(df['Started Date'])
         df = df.rename(columns={"Started Date": "Date"})
 
