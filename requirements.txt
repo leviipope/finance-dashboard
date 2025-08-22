@@ -1,6 +1,0 @@
-cryptography==45.0.6
-pandas==2.3.2
-plotly==6.1.2
-PyGithub==2.6.1
-PyGithub==2.7.0
-streamlit==1.46.0
