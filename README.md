@@ -24,10 +24,7 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ user data encryption
 - ✅ user data deletion option
 
-### Known bugs
-- when pressing enter on login page, nothing happens
-
-# Questlog
+# Possible upgrades
 - demo mode: so user doesnt have to upload a file
 - ✅ convert welcome message in sidebar to a st.toast() instead
     - (and maybe even the failed to upload x rows st.warning() too)
@@ -62,7 +59,7 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ list of biggest transactions in a month (top 10/15)
 - ✅ daily spend heatmap
     - ✅ format hover data on all graphs like on this one
-- 🚧 balance over time (its still missing something)
+- ✅ balance over time
     - ✅ at each datapoint (when hovering) show deatils value
 
 ### Debits page
@@ -71,6 +68,3 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ how much of your monthly income did you save?
 
 ### 🚧 How to use / About / Feedback / Contact page
-
-#### Finished quests
-- 

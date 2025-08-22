@@ -59,10 +59,12 @@ def login_page():
         
         _, col2, _ = st.columns([1, 2, 1])
         with col2:
-            username = st.text_input("Username", placeholder="Enter your username", key="login_username")
-            password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
-            
-            if st.button("Login", use_container_width=True, type="primary"):
+            with st.form("login_form"):
+                username = st.text_input("Username", placeholder="Enter your username", key="login_username")
+                password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
+                login = st.form_submit_button("Login", use_container_width=True, type="primary")
+
+            if login:
                 if authenticate_user(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username
