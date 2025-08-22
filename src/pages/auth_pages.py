@@ -102,7 +102,7 @@ def login_page():
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.info("🎯 **Guest Mode Features:**\n- Upload and analyze your CSV file\n- All dashboard analytics available\n- Data is temporary (not saved)")
+            st.info("🎯 **Guest Mode Features:**\n- Upload (or pick demo) and analyze your CSV file\n- All dashboard analytics available\n- Data is temporary (not saved)\n- HUF is assumed")
             st.warning("⚠️ **Note:** Your data will be lost when you close the browser!")
             
             if st.button("👤 Continue as Guest", use_container_width=True, type="secondary"):

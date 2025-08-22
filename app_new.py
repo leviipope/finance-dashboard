@@ -40,23 +40,50 @@ def guest_file_upload():
     """Handle file upload for guest users"""
     st.title("Guest Mode - Upload Your Data")
     
-    uploaded_file = st.file_uploader("Upload your Revolut statement to get started", type=["csv"])
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.info("📤 Upload your own Revolut statement (data is not stored)")
+        uploaded_file = st.file_uploader("Upload your Revolut statement to get started", type=["csv"])
     
-    if uploaded_file is not None:
-        # For guests, we don't have a pre-selected currency.
-        # We can either ask for it, or use a default. Let's use a default for simplicity.
-        guest_df = load_statement(uploaded_file, 'HUF') # Assuming HUF for guests
-        if guest_df is not None:
-            st.session_state.guest_dataframe = guest_df
-            st.success("File uploaded successfully! You can now use all analytics features.")
-            return True
-        else:
-            st.error("Error processing the uploaded file.")
-            return False
-    else:
-        st.info("Please upload a CSV file to continue with guest mode.")
-        return False
+        if uploaded_file is not None:
+            # For guests, we don't have a pre-selected currency. Using a default for simplicity.
+            guest_df = load_statement(uploaded_file, 'HUF') # Assuming HUF for guests
+            if guest_df is not None:
+                st.session_state.guest_dataframe = guest_df
+                st.success("File uploaded successfully! You can now use all analytics features.")
+                return True
+            else:
+                st.error("Error processing the uploaded file.")
+                return False
+            
+    with col2:
+        st.info("🧪 Try with demo data")
+        if st.button("Load Demo Data", use_container_width=True):
+            try:
+                from src.data.github_storage import read_github_file
+                from io import StringIO
 
+                # Get demo CSV content as a string
+                demo_csv_content = read_github_file("data/demo_dataframe.csv")
+                
+                if demo_csv_content:
+                    csv_file_obj = StringIO(demo_csv_content)
+                    demo_statement = load_statement(csv_file_obj, 'USD')
+                    
+                    if demo_statement is not None:
+                        st.session_state.guest_dataframe = demo_statement
+                        st.success("Demo data loaded successfully! You can now explore all features.")
+                        return True
+                    else:
+                        st.error("Could not process demo data.")
+                else:
+                    st.error("Could not load data from repository.")
+            except Exception as e:
+                st.error(f"Error loading demo data: {str(e)}")
+            
+            return False
+    st.info("Please upload a CSV file or use demo data to continue with guest mode.")
+    return False
 
 def initial_setup_page():
     """Page for initial currency selection and data upload."""

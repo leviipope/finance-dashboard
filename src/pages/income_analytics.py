@@ -16,6 +16,7 @@ def income_analytics_page():
             st.error("No data available. Please upload a CSV file first.")
             return
         main_df = st.session_state.guest_dataframe.copy()
+        st.warning("Monthly income metrics aren't functional in guest mode as it calculates the last three months from the present time of viewing.")
     else:
         main_df = load_main_dataframe()
         
@@ -60,7 +61,6 @@ def income_analytics_page():
             current_income = monthly_incomes[i]
             previous_income = monthly_incomes[i + 1] if i + 1 < len(monthly_incomes) else 0
             
-            st.write(type(user_currency) is str)
             income_formatted = format_currency(current_income, user_currency)
             income_delta = format_currency(current_income - previous_income, user_currency)
             
