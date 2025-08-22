@@ -77,7 +77,6 @@ def login_page():
                     st.error("Invalid username or password!")
             
             # Change Password Button
-            st.markdown("---")
             if st.button("🔐 Change Password", use_container_width=True, type="secondary"):
                 st.session_state.show_change_password = True
                 st.rerun()
@@ -112,3 +111,35 @@ def login_page():
                 st.session_state.categories = {"Uncategorized": []}
                 st.success("Welcome, Guest! Please upload a CSV file to get started.")
                 st.rerun()
+
+    st.markdown("---")
+    st.markdown(
+        """
+        <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            left: 0;
+            z-index: 999;
+        }
+        .content {
+            margin-bottom: 60px; /* Add space for footer */
+        }
+        </style>
+        
+        <div class="content"></div>
+        
+        <div class="footer">
+            <p style="color: #666; font-size: 0.9em; margin: 0;">
+                Developed by Polgari Levente | 
+                <a href="https://github.com/leviipope" target="_blank">Github</a> | 
+                <a href="https://leviipope.github.io/cv-website" target="_blank">Website</a> | 
+                <a href="https://www.linkedin.com/in/levente-polg%C3%A1ri-9681a0303/" target="_blank">LinkedIn</a>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
