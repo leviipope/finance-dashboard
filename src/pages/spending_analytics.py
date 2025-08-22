@@ -17,6 +17,9 @@ def spending_analytics_page():
     if main_df is not None:
         # Get user's currency
         user_currency = get_user_currency(st.session_state.username)
+        if user_currency is None:
+            user_currency = "HUF"
+            st.warning("No currency set for user, defaulting to HUF.")
         
         spending_df = main_df[main_df['Amount'] < 0].copy()
 

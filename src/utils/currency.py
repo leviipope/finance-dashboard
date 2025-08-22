@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 import re
 import json
+from typing import Optional
 
 # Currency configuration and formatting
 CURRENCY_SYMBOLS = {
@@ -57,7 +58,7 @@ import json
 import streamlit as st
 from ..data.github_storage import read_github_file, get_user_files, write_encrypted_github_file, read_encrypted_github_file
 
-def format_currency(amount, currency='HUF', show_symbol=True, compact=False):
+def format_currency(amount, currency: str ='HUF', show_symbol=True, compact=False):
     """Format amount with appropriate currency symbol and formatting"""
     currency = currency.upper()
     symbol = CURRENCY_SYMBOLS.get(currency, currency)
@@ -95,7 +96,7 @@ def format_currency(amount, currency='HUF', show_symbol=True, compact=False):
 from ..data.github_storage import read_encrypted_github_file, write_encrypted_github_file, get_user_files
 
 
-def get_user_currency(username):
+def get_user_currency(username:str) -> Optional[str]:
     """Get the currency for a specific user from their data"""
     if st.session_state.is_guest:
         return st.session_state.get('currency', 'HUF')
@@ -123,7 +124,7 @@ def get_user_currency(username):
     return None  # Default fallback if no currency is set
 
 
-def save_user_currency(username, currency):
+def save_user_currency(username: str, currency: str):
     """Save the user's selected currency."""
     if st.session_state.is_guest:
         st.session_state['currency'] = currency

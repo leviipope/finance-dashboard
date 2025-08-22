@@ -25,6 +25,9 @@ def income_analytics_page():
 
     # Get user's currency
     user_currency = get_user_currency(st.session_state.username)
+    if user_currency is None:
+        user_currency = "HUF"
+        st.warning("No currency set for user, defaulting to HUF.")
 
     income_df = main_df[main_df['Amount'] > 0].copy()
     income_df = income_df[income_df['Hide'] == False]
@@ -57,6 +60,7 @@ def income_analytics_page():
             current_income = monthly_incomes[i]
             previous_income = monthly_incomes[i + 1] if i + 1 < len(monthly_incomes) else 0
             
+            st.write(type(user_currency) is str)
             income_formatted = format_currency(current_income, user_currency)
             income_delta = format_currency(current_income - previous_income, user_currency)
             
