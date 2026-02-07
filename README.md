@@ -2,6 +2,10 @@
 
 A personal finance dashboard built with Streamlit that tracks spending, categorizes transactions, and provides insights into financial habits. Supports bank statements from Revolut.
 
+# Overview
+![Dashboard Screenshot](img/spending.jpg)
+[More screenshots](img/IMAGES.md)
+
 ## Features
 - 🔐 User authentication with data encryption
 - 📊 Interactive spending analytics and visualizations
@@ -12,6 +16,7 @@ A personal finance dashboard built with Streamlit that tracks spending, categori
 
 ## Demo
 🚀 **Live App**: https://revolut-data-analysis.streamlit.app
+Note: Streamlit Cloud may hibernate the app after a period of inactivity, press on "wake up app", then you'll probably see an error message, ignore it, the page will refresh itself eventually (if it doesn't for 1-2 minutes refresh the page manually) and the app will load after a few seconds.
 
 ## Deployment
 This app is deployed on Streamlit Cloud with encrypted data stored securely in a private GitHub repository.
@@ -25,5 +30,5 @@ This app is deployed on Streamlit Cloud with encrypted data stored securely in a
 - ✅ user data deletion option
 
 ## Contact
-- [Website](https://leviipope.github.io/cv-website)
+- [Website](https://leviipope.github.io/cv-website) - outdated, but contains contact information
 - [LinkedIn](https://www.linkedin.com/in/levente-polg%C3%A1ri-9681a0303/)

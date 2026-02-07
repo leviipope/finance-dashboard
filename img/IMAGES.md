@@ -1,0 +1,5 @@
+![Login page](login.jpg)
+![Data customization page](data_cust.jpg)
+![Spending analytics page](spending.jpg)
+![Spending analytics page 2](spending2.jpg)
+![Income analytics page](income.jpg)
